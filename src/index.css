@@ -1,0 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  margin: 2rem auto;
+}
+
+.auth-form {
+  text-align: center;
+  margin: 2rem auto;
+}
