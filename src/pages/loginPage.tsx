@@ -3,7 +3,7 @@ import AuthForm from "../components/AuthForm";
 function LoginPage() {
   return (
     <>
-      <h1>Login Page</h1>
+      <h2>Login Page</h2>
       <AuthForm />
     </>
   );

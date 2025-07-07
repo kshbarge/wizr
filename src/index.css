@@ -4,7 +4,12 @@
   box-sizing: border-box;
 }
 
-h1 {
+.navbar {
+  text-align: center;
+  margin: 2rem auto;
+}
+
+h2 {
   text-align: center;
   margin: 2rem auto;
 }
