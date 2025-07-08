@@ -60,6 +60,27 @@ h2 {
   outline: none;
 }
 
+.auth-form button {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid black;
+  border-radius: 6px;
+  background-color: #fdd673;
+  color: black;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-form button:hover {
+  background-color: #ffb700;
+}
+
+.auth-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .auth-form .password-field,
 .auth-form .registration-field {
   display: flex;
@@ -77,4 +98,35 @@ h2 {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.swal-popup {
+  font-family: sans-serif;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+}
+
+.swal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.swal-button {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid black;
+  border-radius: 6px;
+  background-color: #fdd673;
+  color: black;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.swal-button:hover {
+  background-color: #ffb700;
 }
