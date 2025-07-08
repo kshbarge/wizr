@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: sans-serif;
+}
+
 header {
   display: flex;
   align-items: center;
@@ -29,6 +33,48 @@ h2 {
 }
 
 .auth-form {
-  text-align: center;
-  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 300px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.auth-form label {
+  font-weight: 500;
+}
+
+.auth-form input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.2s ease;
+}
+
+.auth-form input:focus {
+  border-color: #333;
+  outline: none;
+}
+
+.auth-form .password-field,
+.auth-form .registration-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
