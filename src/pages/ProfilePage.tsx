@@ -3,6 +3,7 @@ import { useState } from "react";
 import UserCard from "../components/UserCard"; 
 
 function ProfilePage() {
+
     const [username, setUsername] = useState("coolJmessy");
     const [avatar, setAvatar] = useState("https://example.com/avatar.png");
 
