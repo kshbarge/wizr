@@ -1,49 +1,66 @@
-import { useState } from "react";
-import type { ChangeEvent, FC } from "react";
+import { useState, type FC } from "react";
 import Swal from "sweetalert2";
 
 const API = { email: "john@doe.com", password: "JohnDoe" };
 
-const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const AuthForm: FC = () => {
   const [email, setEmail] = useState<string>("");
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [displayForm, setDisplayForm] = useState<boolean>(false);
 
-  const isRegistered = email === API.email;
-  const isValidEmail = emailRegex.test(email);
+  // const isValidEmail = emailRegex.test(email);
 
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setEmail(event.target.value);
-  };
-
-  const handleLogin = (event: React.MouseEvent<HTMLButtonElement>): void => {
-    console.log(event);
+  const handleClick = (): void => {
     Swal.fire({
-      icon: "success",
-      title: "Welcome back!",
-      text: "You are successfully logged in.",
+      position: "top-end",
+      title: "Verifying email...",
       customClass: {
         popup: "swal-popup",
         title: "swal-title",
-        confirmButton: "swal-button",
+        loader: "swal-loading",
       },
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
     });
-  };
 
-  const handleRegistration = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    console.log(event);
-    Swal.fire({
-      icon: "success",
-      title: "Welcome!",
-      text: "You are successfully registered.",
-      customClass: {
-        popup: "swal-popup",
-        title: "swal-title",
-        confirmButton: "swal-button",
-      },
-    });
+    setTimeout(() => {
+      if (email === API.email) {
+        setIsRegistered(true);
+        setDisplayForm(false);
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          iconColor: "#fdd673",
+          title: "Welcome back!",
+          text: "Please, enter your password.",
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            confirmButton: "swal-button",
+          },
+        });
+      } else {
+        setIsRegistered(false);
+        setDisplayForm(true);
+        Swal.fire({
+          position: "top-end",
+          icon: "info",
+          iconColor: "#fdd673",
+          title: "Email not found",
+          text: "Please, try again or fill the registration form.",
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            confirmButton: "swal-button",
+          },
+        });
+      }
+    }, 1500);
   };
 
   return (
@@ -54,21 +71,24 @@ const AuthForm: FC = () => {
         type="email"
         value={email}
         placeholder="Enter your email to login or sign up"
-        onChange={handleEmailChange}
+        onChange={(event) => setEmail(event.target.value)}
         required
       />
+      <button type="button" onClick={handleClick}>
+        Next
+      </button>
 
       {isRegistered && (
         <div className="password-field">
           <label htmlFor="password">Password:</label>
           <input id="password" type="password" required />
-          <button type="button" onClick={handleLogin}>
+          <button type="button" onClick={() => console.log("registered")}>
             Login
           </button>
         </div>
       )}
 
-      {isValidEmail && !isRegistered && (
+      {displayForm && (
         <div className="registration-field">
           <label htmlFor="username">Username:</label>
           <input id="username" type="text" required />
@@ -76,7 +96,7 @@ const AuthForm: FC = () => {
           <input id="fullname" type="text" required />
           <label htmlFor="date-of-birth">Date of Birth:</label>
           <input id="date-of-birth" type="date" />
-          <button type="button" onClick={handleRegistration}>
+          <button type="button" onClick={() => console.log("not registered")}>
             Submit
           </button>
         </div>
