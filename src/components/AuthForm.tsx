@@ -3,16 +3,16 @@ import Swal from "sweetalert2";
 
 const API = { email: "john@doe.com", password: "JohnDoe" };
 
-// const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const AuthForm: FC = () => {
   const [email, setEmail] = useState<string>("");
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [displayForm, setDisplayForm] = useState<boolean>(false);
 
-  // const isValidEmail = emailRegex.test(email);
+  const isValidEmail = emailRegex.test(email);
 
-  const handleClick = (): void => {
+  const handleEmailClick = (): void => {
     Swal.fire({
       position: "top-end",
       title: "Verifying email...",
@@ -74,7 +74,7 @@ const AuthForm: FC = () => {
         onChange={(event) => setEmail(event.target.value)}
         required
       />
-      <button type="button" onClick={handleClick}>
+      <button type="button" onClick={handleEmailClick} disabled={!isValidEmail}>
         Next
       </button>
 
