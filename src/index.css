@@ -114,6 +114,14 @@ h2 {
   max-width: 300px;
 }
 
+.swal-popup--success {
+  box-shadow: 0px 0px 10px 10px rgba(0, 255, 0, 0.1);
+}
+
+.swal-popup--error {
+  box-shadow: 0px 0px 10px 10px rgba(255, 0, 0, 0.1);
+}
+
 .swal-title {
   font-size: 1.25rem;
   font-weight: 600;
