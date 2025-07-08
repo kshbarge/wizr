@@ -1,7 +1,8 @@
-import { useState } from "react";
-import UserCard from "./UserCard";
 
-function Profile() {
+import { useState } from "react";
+import UserCard from "../components/UserCard"; 
+
+function ProfilePage() {
     const [username, setUsername] = useState("coolJmessy");
     const [avatar, setAvatar] = useState("https://example.com/avatar.png");
 
@@ -24,4 +25,5 @@ function Profile() {
         </div>
     );
 }
-export default Profile
+
+export default ProfilePage;
