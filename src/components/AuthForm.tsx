@@ -1,7 +1,22 @@
-import { useState, type FC } from "react";
+import { useState, type FC, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const API = { email: "john@doe.com", password: "JohnDoe" };
+const APIuser = {
+  email: "john@doe.com",
+  password: "JohnDoe",
+  username: "This is John Doe",
+  fullname: "John Doe",
+  dateOfBirth: "2000-07-01",
+};
+
+const APInewUser = {
+  email: "",
+  password: "",
+  username: "",
+  fullname: "",
+  dateOfBirth: "",
+};
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -9,12 +24,14 @@ const AuthForm: FC = () => {
   const [email, setEmail] = useState<string>("");
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [displayForm, setDisplayForm] = useState<boolean>(false);
-
-  const isValidEmail = emailRegex.test(email);
-
   const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [fullname, setFullname] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>("");
+  const isValidEmail = emailRegex.test(email);
+  const navigate = useNavigate();
 
-  const handleEmailClick = (): void => {
+  const handleEmail = (): void => {
     Swal.fire({
       position: "top-end",
       title: "Verifying email...",
@@ -31,7 +48,7 @@ const AuthForm: FC = () => {
     });
 
     setTimeout(() => {
-      if (email === API.email) {
+      if (email === APIuser.email) {
         setIsRegistered(true);
         setDisplayForm(false);
         Swal.fire({
@@ -47,6 +64,7 @@ const AuthForm: FC = () => {
           },
         });
       } else {
+        APInewUser.email = email;
         setIsRegistered(false);
         setDisplayForm(true);
         Swal.fire({
@@ -65,7 +83,7 @@ const AuthForm: FC = () => {
     }, 1500);
   };
 
-  const handlePasswordClick = (): void => {
+  const handlePassword = (): void => {
     Swal.fire({
       position: "top-end",
       title: "Verifying password...",
@@ -82,19 +100,24 @@ const AuthForm: FC = () => {
     });
 
     setTimeout(() => {
-      if (password === API.password) {
+      if (password === APIuser.password) {
         Swal.fire({
           position: "top-end",
           icon: "success",
           iconColor: "#fdd673",
           title: "Access granted!",
-          text: "You have successfully logged in.",
+          text: "You have successfully logged in. Redirecting to your profile...",
           customClass: {
             popup: "swal-popup swal-popup--success",
             title: "swal-title",
-            confirmButton: "swal-button",
           },
+          timer: 1500,
+          showConfirmButton: false,
         });
+
+        setTimeout(() => {
+          navigate("/profile");
+        }, 1500);
       } else {
         Swal.fire({
           position: "top-end",
@@ -112,8 +135,54 @@ const AuthForm: FC = () => {
     }, 1500);
   };
 
+  const handleRegistration = (event: FormEvent): void => {
+    event.preventDefault();
+
+    Swal.fire({
+      position: "top-end",
+      title: "Registering...",
+      customClass: {
+        popup: "swal-popup",
+        title: "swal-title",
+        loader: "swal-loading",
+      },
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    setTimeout(() => {
+      APInewUser.username = username;
+      APInewUser.fullname = fullname;
+      APInewUser.dateOfBirth = dateOfBirth;
+      APInewUser.password = password;
+      console.log(APInewUser);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        iconColor: "#fdd673",
+        title: "Registration successful!",
+        text: "Redirecting to your profile...",
+        customClass: {
+          popup: "swal-popup swal-popup--success",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
+    }, 1500);
+  };
+
   return (
-    <form className="auth-form">
+    <form className="auth-form" onSubmit={handleRegistration}>
       <label htmlFor="email">Email:</label>
       <input
         id="email"
@@ -126,7 +195,7 @@ const AuthForm: FC = () => {
       />
       <button
         type="button"
-        onClick={handleEmailClick}
+        onClick={handleEmail}
         disabled={!isValidEmail || isRegistered}
       >
         Next
@@ -142,7 +211,7 @@ const AuthForm: FC = () => {
             onChange={(event) => setPassword(event.target.value)}
             required
           />
-          <button type="button" onClick={handlePasswordClick}>
+          <button type="button" onClick={handlePassword}>
             Login
           </button>
         </div>
@@ -151,14 +220,34 @@ const AuthForm: FC = () => {
       {displayForm && (
         <div className="registration-field">
           <label htmlFor="username">Username:</label>
-          <input id="username" type="text" required />
+          <input
+            id="username"
+            type="text"
+            onChange={(event) => setUsername(event.target.value)}
+            required
+          />
           <label htmlFor="fullname">Full name:</label>
-          <input id="fullname" type="text" required />
+          <input
+            id="fullname"
+            type="text"
+            onChange={(event) => setFullname(event.target.value)}
+            required
+          />
           <label htmlFor="date-of-birth">Date of Birth:</label>
-          <input id="date-of-birth" type="date" />
-          <button type="button" onClick={() => console.log("not registered")}>
-            Submit
-          </button>
+          <input
+            id="date-of-birth"
+            type="date"
+            onChange={(event) => setDateOfBirth(event.target.value)}
+            required
+          />
+          <label htmlFor="password">Password:</label>
+          <input
+            id="password"
+            type="password"
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
+          <button type="submit">Submit</button>
         </div>
       )}
     </form>
