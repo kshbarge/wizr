@@ -9,7 +9,11 @@ function Navbar() {
     throw new Error("No context");
   }
 
-  const [user] = context;
+  const [user, setUser] = context;
+
+  const handleLogout = (): void => {
+    setUser(null);
+  };
 
   return (
     <nav>
@@ -23,8 +27,13 @@ function Navbar() {
         <li>
           <NavLink to="/session">Session</NavLink>
         </li>
-        {user && <li>Username: {user.username}</li>}
+        {user && <li>Welcome, {user.username}!</li>}
       </ul>
+      {user && (
+        <button type="submit" onClick={handleLogout}>
+          Logout
+        </button>
+      )}
     </nav>
   );
 }
