@@ -92,8 +92,6 @@ const AuthForm: FC = () => {
   };
 
   const handlePassword = (): void => {
-    setUser({ username: APIuser.username });
-
     Swal.fire({
       position: "top-end",
       title: "Verifying password...",
@@ -111,6 +109,8 @@ const AuthForm: FC = () => {
 
     setTimeout(() => {
       if (password === APIuser.password) {
+        setUser({ username: APIuser.username });
+
         Swal.fire({
           position: "top-end",
           icon: "success",
