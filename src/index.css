@@ -5,7 +5,33 @@
 }
 
 body {
+  margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("https://cdn-images-1.medium.com/v2/resize:fit:918/1*U3WRRwLx3zeDkHmIVGLJdw.gif");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: bottom;
+  background-attachment: fixed;
+  opacity: 0.4;
+  z-index: -2;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-color: rgba(253, 214, 115, 0.2);
+  z-index: -1;
 }
 
 header {
@@ -15,7 +41,12 @@ header {
   margin: 2rem;
 }
 
-ul {
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav ul {
   display: flex;
   list-style: none;
   padding: 0;
@@ -23,8 +54,39 @@ ul {
   gap: 1rem;
 }
 
-ul li a {
+nav ul li a {
   text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid black;
+  border-radius: 6px;
+  background-color: #fdd673;
+  color: black;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+nav ul li a.active {
+  background-color: black;
+  color: white;
+  border-color: #fdd673;
+}
+
+nav button {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid black;
+  border-radius: 6px;
+  background-color: #fdd673;
+  color: black;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 1rem;
+}
+
+nav button:hover {
+  background-color: #ffb700;
 }
 
 h2 {

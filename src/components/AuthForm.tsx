@@ -1,5 +1,6 @@
-import { useState, type FC, type FormEvent } from "react";
+import { useState, useContext, type FC, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import UserContext from "../contexts/userContext";
 import Swal from "sweetalert2";
 
 const APIuser = {
@@ -30,6 +31,13 @@ const AuthForm: FC = () => {
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
   const isValidEmail = emailRegex.test(email);
   const navigate = useNavigate();
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error("No context");
+  }
+
+  const [, setUser] = context;
 
   const handleEmail = (): void => {
     Swal.fire({
@@ -101,6 +109,8 @@ const AuthForm: FC = () => {
 
     setTimeout(() => {
       if (password === APIuser.password) {
+        setUser({ username: APIuser.username });
+
         Swal.fire({
           position: "top-end",
           icon: "success",
@@ -158,6 +168,7 @@ const AuthForm: FC = () => {
       APInewUser.fullname = fullname;
       APInewUser.dateOfBirth = dateOfBirth;
       APInewUser.password = password;
+      setUser({ username: APInewUser.username });
 
       Swal.fire({
         position: "top-end",
