@@ -158,7 +158,6 @@ const AuthForm: FC = () => {
       APInewUser.fullname = fullname;
       APInewUser.dateOfBirth = dateOfBirth;
       APInewUser.password = password;
-      console.log(APInewUser);
 
       Swal.fire({
         position: "top-end",
