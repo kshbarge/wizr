@@ -1,9 +1,11 @@
-import { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { useContext, type FC } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import UserContext from "../contexts/userContext";
 
-function Navbar() {
+const Navbar: FC = () => {
   const context = useContext(UserContext);
+  const navigate = useNavigate();
 
   if (!context) {
     throw new Error("No context");
@@ -12,7 +14,43 @@ function Navbar() {
   const [user, setUser] = context;
 
   const handleLogout = (): void => {
-    setUser(null);
+    Swal.fire({
+      position: "top-end",
+      title: "Logging out...",
+      customClass: {
+        popup: "swal-popup",
+        title: "swal-title",
+        loader: "swal-loading",
+      },
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    setTimeout(() => {
+      setUser(null);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        iconColor: "#fdd673",
+        title: "Logout successful!",
+        text: "Redirecting to the login page...",
+        customClass: {
+          popup: "swal-popup swal-popup--success",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+    }, 1500);
   };
 
   return (
@@ -36,6 +74,6 @@ function Navbar() {
       )}
     </nav>
   );
-}
+};
 
 export default Navbar;
