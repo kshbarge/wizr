@@ -4,16 +4,17 @@ import Skills from "../components/Skills";
 import "../styles/ProfilePage.css";
 
 function ProfilePage() {
-  const [username, setUsername] = useState("coolJmessy");
-  const [avatar, setAvatar] = useState("https://example.com/avatar.png");
-  const [skillToTeach, setSkillToTeach] = useState("Japanese");
-  const [skillToLearn, setSkillToLearn] = useState("German");
 
-  const handleSave = (newUsername: string, newAvatar: string) => {
-    console.log("submitted", newUsername, newAvatar);
-    setUsername(newUsername);
-    setAvatar(newAvatar);
-  };
+    const [username, setUsername] = useState("");
+    const [avatar, setAvatar] = useState("https://example.com/avatar.png");
+    const [skillToTeach, setSkillToTeach] = useState("Japanese");
+    const [skillToLearn, setSkillToLearn] = useState("German");
+
+    const handleSave = ( newUsername: string, newAvatar: string) => {
+        console.log ("submitted",  newUsername, newAvatar);
+        setUsername(newUsername);
+        setAvatar(newAvatar);
+    };
 
   const handleSkillSave = (
     newSkillToTeach: string,
