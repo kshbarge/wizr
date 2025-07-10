@@ -77,13 +77,15 @@ function SessionPage() {
     const timeLeftWarningInMins = 5
 
     const timeUntilSessionWarning = (lengthOfSessionInMins - timeLeftWarningInMins) * 60 *1000;
-    const timeUntilSessionEnds = (lengthOfSessionInMins * 60 * 1000)
+    const timeUntilSessionEnds = lengthOfSessionInMins * 60 * 1000
+    const fullLengthOfSessionInMins = 60
+    const endOfFullSession = fullLengthOfSessionInMins * 60 * 1000
 
     setTimeout(() =>{
        Swal.fire({
               icon: "warning",
               title: "5 minutes remaining",
-              text: "Your session will end in 5 minutes",
+              text: "Your session will end in 5 minutes, get ready to swap over",
               iconColor: "#fdd673",
               confirmButtonText: "OK",
               customClass: {
@@ -91,11 +93,11 @@ function SessionPage() {
               },
           })
         }, timeUntilSessionWarning);
-        setTimeout(() =>{
+          setTimeout(() =>{
         Swal.fire({
               icon: "info",
-              title: "Session has ended",
-              text: "Your session has now ended",
+              title: "Time to swap",
+              text: "Your turn has now ended, please swap over",
               iconColor: "#fdd673",
               confirmButtonText: "OK",
               customClass: {
@@ -103,6 +105,18 @@ function SessionPage() {
               },
           })
         }, timeUntilSessionEnds);
+         setTimeout(() =>{
+        Swal.fire({
+              icon: "info",
+              title: "Session has ended",
+              text: "The session has now ended",
+              iconColor: "#fdd673",
+              confirmButtonText: "OK",
+              customClass: {
+                confirmButton: "swal-button",
+              },
+          })
+        }, endOfFullSession);
       })
     return () => {api.dispose();
     };
