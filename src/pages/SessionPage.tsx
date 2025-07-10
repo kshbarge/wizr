@@ -1,5 +1,6 @@
 import { useEffect, useContext } from "react";
 import UserContext from "../contexts/userContext";
+import "../styles/SessionPage.css";
 
 interface JitsiMeetExternalAPIConstructor {
   new (

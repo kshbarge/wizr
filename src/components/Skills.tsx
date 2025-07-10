@@ -17,9 +17,9 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
     useState(skillToTeach);
   const [selectedSkillToLearn, setSelectedSkillToLearn] =
     useState(skillToLearn);
+  const navigate = useNavigate();
 
   const skills = ["French", "English", "Japanese", "German"];
-  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,49 +29,150 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
     setEditing(false);
   };
 
-  const handleMatch = () => {
-    Swal.fire({
-      position: "top-end",
-      title: "Searching match...",
-      customClass: {
-        popup: "swal-popup",
-        title: "swal-title",
-        loader: "swal-loading",
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-    });
+  const waitForMatch = () => {
+    return new Promise<void>((resolve, reject) => {
+      let matched = false;
+      let tipIndex = 0;
 
-    setTimeout(() => {
-      // Invia i dati al server
+      const tips = [
+        "Looking for someone who fits...",
+        "Remember to listen and share kindly!",
+        "Almost there...",
+        "Learning is a two-way exercise",
+        "Knowledge is power!",
+      ];
+
+      const loopTip = async () => {
+        if (matched) return;
+
+        await Swal.fire({
+          title: "Matching in progress...",
+          text: `${tips[tipIndex]}`,
+          customClass: {
+            popup: "swal-popup",
+            title: "swal-title",
+            loader: "swal-loading",
+          },
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => Swal.showLoading(),
+          timer: 3000,
+        });
+
+        tipIndex = (tipIndex + 1) % tips.length;
+
+        if (!matched) loopTip();
+      };
+
+      loopTip();
+
+      socket.once("matchFound", () => {
+        matched = true;
+        resolve();
+      });
+
+      setTimeout(() => {
+        if (!matched) {
+          matched = true;
+          reject(new Error("No match found"));
+        }
+      }, 10000);
+    });
+  };
+
+  const handleMatch = async () => {
+    try {
+      await Swal.fire({
+        icon: "question",
+        iconColor: "#fdd673",
+        title: "Ready?",
+        text: "You're about to learn some great stuff and teach what you really love!",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          timerProgressBar: "swal-bar",
+        },
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
+      await Swal.fire({
+        icon: "info",
+        iconColor: "#fdd673",
+        title: "Timing",
+        text: "Do not forget to swap when the notification appears!",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          timerProgressBar: "swal-bar",
+        },
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
+      await Swal.fire({
+        icon: "warning",
+        iconColor: "#fdd673",
+        title: "A thoughtful place",
+        text: "Please, respect each other!",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          timerProgressBar: "swal-bar",
+        },
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
       socket.emit("startMatch", {
-        userId: 1, // sostituisci con vero ID se disponibile
+        userId: 1,
         skillToTeach: selectedSkillToTeach,
         skillToLearn: selectedSkillToLearn,
       });
 
-      // Mostra conferma e redirect
-      Swal.fire({
-        position: "top-end",
+      await waitForMatch();
+
+      await Swal.fire({
         icon: "success",
         iconColor: "#fdd673",
         title: "Match found!",
-        text: "You have successfully matched. Redirecting to your profile...",
+        text: "Redirecting to your session...",
         customClass: {
           popup: "swal-popup swal-popup--success",
           title: "swal-title",
+          loader: "swal-loader",
         },
-        timer: 1500,
+        timer: 3000,
         showConfirmButton: false,
       });
 
-      setTimeout(() => {
-        navigate("/session");
-      }, 1500);
-    }, 2000); // Simula tempo di attesa per il match
+      navigate("/session");
+    } catch (error) {
+      console.error(error);
+
+      await Swal.fire({
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "Sorry!",
+        text: "No match found. Please, try again later.",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+        confirmButtonText: "Okay",
+      });
+    }
   };
 
   return (
