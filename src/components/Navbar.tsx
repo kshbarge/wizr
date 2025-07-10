@@ -1,7 +1,7 @@
 import { useContext, type FC } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
 import UserContext from "../contexts/userContext";
+import Swal from "sweetalert2";
 
 const Navbar: FC = () => {
   const context = useContext(UserContext);
