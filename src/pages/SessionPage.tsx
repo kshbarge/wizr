@@ -1,18 +1,45 @@
 import { useEffect, useContext } from "react";
 import UserContext from "../contexts/userContext";
 
+interface JitsiMeetExternalAPIConstructor {
+  new (
+    domain: string,
+    options: JitsiMeetExternalAPIOptions
+  ): JitsiMeetExternalAPIInstance;
+}
+
+interface JitsiMeetExternalAPIOptions {
+  roomName: string;
+  width: string | number;
+  height: string | number;
+  parentNode: HTMLElement | null;
+  configOverwrite?: Record<string, unknown>;
+  interfaceConfigOverwrite?: Record<string, unknown>;
+  userInfo?: {
+    displayName?: string;
+  };
+}
+
+interface JitsiMeetExternalAPIInstance {
+  addEventListener: (event: string, callback: () => void) => void;
+  dispose: () => void;
+}
+
 function SessionPage() {
   const context = useContext(UserContext);
-
   if (!context) throw new Error("No context");
 
   const [user] = context;
 
   useEffect(() => {
     const domain = "meet.jit.si";
-    const roomName = "KnowledgeIsPower_" + Math.floor(Math.random() * 100000);
+    const roomName =
+      "KnowledgeIsPower_" +
+      (user?.username || "Guest") +
+      "_" +
+      Math.floor(Math.random() * 100000);
 
-    const options = {
+    const options: JitsiMeetExternalAPIOptions = {
       roomName,
       width: "100%",
       height: "100%",
@@ -30,19 +57,25 @@ function SessionPage() {
       },
     };
 
-    const API = new window.JitsiMeetExternalAPI(domain, options);
+    const JitsiAPI = (
+      window as unknown as {
+        JitsiMeetExternalAPI: JitsiMeetExternalAPIConstructor;
+      }
+    ).JitsiMeetExternalAPI;
 
-    API.addEventListener("videoConferenceJoined", () => {
+    const api = new JitsiAPI(domain, options);
+
+    api.addEventListener("videoConferenceJoined", () => {
       console.log("Joined room as", user?.username);
     });
 
-    return () => API.dispose();
+    return () => api.dispose();
   }, [user]);
 
   return (
     <>
       <h2>Welcome to your Knowledge is Power session page:</h2>
-      <div id="jitsi-container" style={{ height: "80vh" }} />
+      <div id="jitsi-container" style={{ height: "80vh", width: "100%" }} />
     </>
   );
 }
