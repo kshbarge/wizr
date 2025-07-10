@@ -13,11 +13,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3",
-<<<<<<< HEAD
-=======
     "sweetalert2": "^11.22.2",
     "socket.io": "^4.8.1",
->>>>>>> origin/main
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
