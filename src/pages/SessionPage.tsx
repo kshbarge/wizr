@@ -76,7 +76,8 @@ function SessionPage() {
     const lengthOfSessionInMins = 30;
     const timeLeftWarningInMins = 5
 
-    const timeLeftOfSession = (lengthOfSessionInMins - timeLeftWarningInMins) * 60 *1000;
+    const timeUntilSessionWarning = (lengthOfSessionInMins - timeLeftWarningInMins) * 60 *1000;
+    const timeUntilSessionEnds = (lengthOfSessionInMins * 60 * 1000)
 
     setTimeout(() =>{
        Swal.fire({
@@ -89,7 +90,19 @@ function SessionPage() {
                 confirmButton: "swal-button",
               },
           })
-        }, timeLeftOfSession);
+        }, timeUntilSessionWarning);
+        setTimeout(() =>{
+        Swal.fire({
+              icon: "info",
+              title: "Session has ended",
+              text: "Your session has now ended",
+              iconColor: "#fdd673",
+              confirmButtonText: "OK",
+              customClass: {
+                confirmButton: "swal-button",
+              },
+          })
+        }, timeUntilSessionEnds);
       })
     return () => {api.dispose();
     };
