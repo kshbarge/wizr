@@ -29,49 +29,101 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
     setEditing(false);
   };
 
-  const handleMatch = () => {
-    Swal.fire({
-      position: "top-end",
-      title: "Searching match...",
-      customClass: {
-        popup: "swal-popup",
-        title: "swal-title",
-        loader: "swal-loading",
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-    });
-
-    setTimeout(() => {
-      // Invia i dati al server
-      socket.emit("startMatch", {
-        userId: 1, // sostituisci con vero ID se disponibile
-        skillToTeach: selectedSkillToTeach,
-        skillToLearn: selectedSkillToLearn,
+  const handleMatch = async () => {
+    try {
+      await Swal.fire({
+        icon: "question",
+        iconColor: "#fdd673",
+        title: "Ready?",
+        text: "You're about to learn some great stuff and teach what you really love!",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          timerProgressBar: "swal-bar",
+        },
+        timer: 10000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       });
 
-      // Mostra conferma e redirect
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
+      await Swal.fire({
+        icon: "info",
         iconColor: "#fdd673",
-        title: "Match found!",
-        text: "You have successfully matched. Redirecting to your profile...",
+        title: "Timing",
+        text: "Do not forget to swap when the notification appears!",
         customClass: {
-          popup: "swal-popup swal-popup--success",
+          popup: "swal-popup",
           title: "swal-title",
+          timerProgressBar: "swal-bar",
         },
-        timer: 1500,
+        timer: 10000,
+        timerProgressBar: true,
         showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
+      await Swal.fire({
+        icon: "warning",
+        iconColor: "#fdd673",
+        title: "A thoughtful place",
+        text: "Please, respect each other!",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          timerProgressBar: "swal-bar",
+        },
+        timer: 10000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+
+      Swal.fire({
+        title: "Searching match...",
+        customClass: {
+          popup: "swal-popup",
+          title: "swal-title",
+          loader: "swal-loading",
+        },
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        timer: 0,
       });
 
       setTimeout(() => {
-        navigate("/session");
-      }, 1500);
-    }, 2000); // Simula tempo di attesa per il match
+        socket.emit("startMatch", {
+          userId: 1,
+          skillToTeach: selectedSkillToTeach,
+          skillToLearn: selectedSkillToLearn,
+        });
+
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          iconColor: "#fdd673",
+          title: "Match found!",
+          text: "You have successfully matched. Redirecting to your profile...",
+          customClass: {
+            popup: "swal-popup swal-popup--success",
+            title: "swal-title",
+          },
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        setTimeout(() => {
+          navigate("/session");
+        }, 1500);
+      }, 2000);
+    } catch (error) {
+      console.log("Match process unsuccessful", error);
+    }
   };
 
   return (
