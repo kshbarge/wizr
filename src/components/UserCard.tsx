@@ -1,7 +1,4 @@
 import React from "react";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:4000");
 
 interface UserCardProps {
   username: string;
@@ -31,11 +28,6 @@ function UserCard({
       const imageURL = URL.createObjectURL(file);
       setAvatar(imageURL);
     }
-  };
-
-  const handleMatch = () => {
-    console.log("Match process started");
-    socket.emit("startMatch", { userId: 1, skill: "guitar" });
   };
 
   return (
@@ -75,9 +67,6 @@ function UserCard({
 
             <div className="actionBtn">
               <button type="submit">Save</button>
-              <button type="button" onClick={handleMatch}>
-                Find a Match
-              </button>
             </div>
           </form>
         </div>
