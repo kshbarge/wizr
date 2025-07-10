@@ -1,5 +1,6 @@
 import { useEffect, useContext } from "react";
 import UserContext from "../contexts/userContext";
+import Swal from "sweetalert2";
 
 interface JitsiMeetExternalAPIConstructor {
   new (
@@ -67,10 +68,29 @@ function SessionPage() {
 
     api.addEventListener("videoConferenceJoined", () => {
       console.log("Joined room as", user?.username);
-    });
+    
+    const lengthOfSessionInMins = 30;
+    const timeLeftWarningInMins = 5
 
-    return () => api.dispose();
+    const timeLeftOfSession = (lengthOfSessionInMins - timeLeftWarningInMins) * 60 *1000;
+
+    setTimeout(() =>{
+       Swal.fire({
+              icon: "warning",
+              title: "5 minutes remaining",
+              text: "Your session will end in 5 minutes",
+              iconColor: "#fdd673",
+              confirmButtonText: "OK",
+              customClass: {
+                confirmButton: "swal-button",
+              },
+          })
+        }, timeLeftOfSession);
+      })
+    return () => {api.dispose();
+    };
   }, [user]);
+  
 
   return (
     <>

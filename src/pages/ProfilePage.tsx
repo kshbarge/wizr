@@ -4,7 +4,7 @@ import Skills from "../components/Skills";
 
 function ProfilePage() {
 
-    const [username, setUsername] = useState("coolJmessy");
+    const [username, setUsername] = useState("");
     const [avatar, setAvatar] = useState("https://example.com/avatar.png");
     const [skillToTeach, setSkillToTeach] = useState("Japanese");
     const [skillToLearn, setSkillToLearn] = useState("German");
