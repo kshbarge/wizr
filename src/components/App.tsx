@@ -4,8 +4,10 @@ import ProfilePage from "../pages/ProfilePage";
 import SessionPage from "../pages/SessionPage";
 import UserCard from "./UserCard";
 import Header from "./Header";
+import Chat from './Chat'
 
 function App() {
+
   return (
     <>
       <Header />
@@ -13,7 +15,11 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/session" element={<SessionPage />} />
+<<<<<<< HEAD
         <Route path="/match" element={<UserCard />} />
+=======
+        <Route path="/chat" element={<Chat/>}/>
+>>>>>>> origin/main
       </Routes>
     </>
   );
