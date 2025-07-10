@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import Swal from "sweetalert2";
 
-const socket = io("http://localhost:4000");
+// const socket = io("http://localhost:4000");
+
+const matched = false; // Please, toggle this to true/false to test match or non-match scenarios
 
 interface SkillProps {
   skillToLearn: string;
@@ -27,58 +29,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       onSave(selectedSkillToTeach, selectedSkillToLearn);
     }
     setEditing(false);
-  };
-
-  const waitForMatch = () => {
-    return new Promise<void>((resolve, reject) => {
-      let matched = false;
-      let tipIndex = 0;
-
-      const tips = [
-        "Looking for someone who fits...",
-        "Remember to listen and share kindly!",
-        "Almost there...",
-        "Learning is a two-way exercise",
-        "Knowledge is power!",
-      ];
-
-      const loopTip = async () => {
-        if (matched) return;
-
-        await Swal.fire({
-          title: "Matching in progress...",
-          text: `${tips[tipIndex]}`,
-          customClass: {
-            popup: "swal-popup",
-            title: "swal-title",
-            loader: "swal-loading",
-          },
-          showConfirmButton: false,
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          didOpen: () => Swal.showLoading(),
-          timer: 3000,
-        });
-
-        tipIndex = (tipIndex + 1) % tips.length;
-
-        if (!matched) loopTip();
-      };
-
-      loopTip();
-
-      socket.once("matchFound", () => {
-        matched = true;
-        resolve();
-      });
-
-      setTimeout(() => {
-        if (!matched) {
-          matched = true;
-          reject(new Error("No match found"));
-        }
-      }, 10000);
-    });
   };
 
   const handleMatch = async () => {
@@ -134,29 +84,42 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      socket.emit("startMatch", {
-        userId: 1,
-        skillToTeach: selectedSkillToTeach,
-        skillToLearn: selectedSkillToLearn,
-      });
+      // socket.emit("startMatch", {
+      //   userId: 1,
+      //   skillToTeach: selectedSkillToTeach,
+      //   skillToLearn: selectedSkillToLearn,
+      // });
 
-      await waitForMatch();
+      if (matched) {
+        await Swal.fire({
+          icon: "success",
+          iconColor: "#fdd673",
+          title: "Match found!",
+          text: "Redirecting to your session...",
+          customClass: {
+            popup: "swal-popup swal-popup--success",
+            title: "swal-title",
+            loader: "swal-loader",
+          },
+          timer: 3000,
+          showConfirmButton: false,
+        });
 
-      await Swal.fire({
-        icon: "success",
-        iconColor: "#fdd673",
-        title: "Match found!",
-        text: "Redirecting to your session...",
-        customClass: {
-          popup: "swal-popup swal-popup--success",
-          title: "swal-title",
-          loader: "swal-loader",
-        },
-        timer: 3000,
-        showConfirmButton: false,
-      });
-
-      navigate("/session");
+        navigate("/session");
+      } else {
+        await Swal.fire({
+          icon: "error",
+          iconColor: "#fdd673",
+          title: "No match found!",
+          text: "Please, try again later.",
+          customClass: {
+            popup: "swal-popup swal-popup--error",
+            title: "swal-title",
+            confirmButton: "swal-button",
+          },
+          confirmButtonText: "Okay",
+        });
+      }
     } catch (error) {
       console.error(error);
 
@@ -164,13 +127,13 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         icon: "error",
         iconColor: "#fdd673",
         title: "Sorry!",
-        text: "No match found. Please, try again later.",
+        text: "Something went wrong.",
         customClass: {
           popup: "swal-popup swal-popup--error",
           title: "swal-title",
           confirmButton: "swal-button",
         },
-        confirmButtonText: "Okay",
+        confirmButtonText: "Back",
       });
     }
   };

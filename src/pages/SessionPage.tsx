@@ -28,7 +28,10 @@ interface JitsiMeetExternalAPIInstance {
 
 function SessionPage() {
   const context = useContext(UserContext);
-  if (!context) throw new Error("No context");
+
+  if (!context) {
+    throw new Error("No context");
+  }
 
   const [user] = context;
 
@@ -76,7 +79,7 @@ function SessionPage() {
   return (
     <>
       <h2>Welcome to your Knowledge is Power session page:</h2>
-      <div id="jitsi-container" style={{ height: "80vh", width: "100%" }} />
+      <div id="jitsi-container" />
     </>
   );
 }
