@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/loginPage";
 import ProfilePage from "../pages/ProfilePage";
 import SessionPage from "../pages/SessionPage";
+import UserCard from "./UserCard";
 import Header from "./Header";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/session" element={<SessionPage />} />
+        <Route path="/match" element={<UserCard />} />
       </Routes>
     </>
   );
