@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { runGermanQuiz } from "../utils/quiz";
 // import io from "socket.io-client";
 import Swal from "sweetalert2";
 
@@ -108,18 +109,27 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
 
         navigate("/session");
       } else {
-        await Swal.fire({
+        const result = await Swal.fire({
           icon: "error",
           iconColor: "#fdd673",
           title: "No match found!",
-          text: "Please, try again later.",
+          text: "Please, try again later or try our quiz!",
           customClass: {
             popup: "swal-popup swal-popup--error",
             title: "swal-title",
             confirmButton: "swal-button",
+            denyButton: "swal-button",
           },
-          confirmButtonText: "Okay",
+          showDenyButton: true,
+          confirmButtonText: "Play quiz",
+          denyButtonText: "Try again",
         });
+
+        if (result.isConfirmed) {
+          runGermanQuiz();
+        } else if (result.isDenied) {
+          handleMatch();
+        }
       }
     } catch (error) {
       console.error(error);
