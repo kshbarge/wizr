@@ -38,6 +38,7 @@ export const runGermanQuiz = async () => {
         title: "swal-title",
         confirmButton: "swal-button",
       },
+      allowOutsideClick: false,
     });
 
     if (answer === question.correct) {
