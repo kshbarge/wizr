@@ -1,10 +1,11 @@
 import { useState } from "react";
-import UserCard from "../components/UserCard"; 
+import UserCard from "../components/UserCard";
 import Skills from "../components/Skills";
+import "../styles/ProfilePage.css";
 
 function ProfilePage() {
 
-    const [username, setUsername] = useState("coolJmessy");
+    const [username, setUsername] = useState("");
     const [avatar, setAvatar] = useState("https://example.com/avatar.png");
     const [skillToTeach, setSkillToTeach] = useState("Japanese");
     const [skillToLearn, setSkillToLearn] = useState("German");
@@ -15,27 +16,32 @@ function ProfilePage() {
         setAvatar(newAvatar);
     };
 
-     const handleSkillSave = ( newSkillToTeach: string, newSkillToLearn: string) => {
-        console.log ("submitted Skill",  newSkillToTeach, newSkillToLearn);
-        setSkillToTeach(newSkillToTeach);
-        setSkillToLearn(newSkillToLearn);
-    };
+  const handleSkillSave = (
+    newSkillToTeach: string,
+    newSkillToLearn: string
+  ) => {
+    console.log("submitted Skill", newSkillToTeach, newSkillToLearn);
+    setSkillToTeach(newSkillToTeach);
+    setSkillToLearn(newSkillToLearn);
+  };
 
-    return (
-        <div className="profile-section">
-            <h2>Your Profile</h2>
-            <UserCard
-            username={username}
-            avatar={avatar}
-            setUsername={setUsername}
-            setAvatar={setAvatar}
-            onSave={handleSave}/>
-            <Skills
-            skillToTeach={skillToTeach}
-            skillToLearn={skillToLearn}
-            onSave={handleSkillSave}/>
-        </div>
-    );
+  return (
+    <div className="profile-section">
+      <h2>Your Profile</h2>
+      <UserCard
+        username={username}
+        avatar={avatar}
+        setUsername={setUsername}
+        setAvatar={setAvatar}
+        onSave={handleSave}
+      />
+      <Skills
+        skillToTeach={skillToTeach}
+        skillToLearn={skillToLearn}
+        onSave={handleSkillSave}
+      />
+    </div>
+  );
 }
 
 export default ProfilePage;

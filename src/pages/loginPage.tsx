@@ -1,3 +1,5 @@
+import "../styles/LoginPage.css";
+
 import AuthForm from "../components/AuthForm";
 
 function LoginPage() {
