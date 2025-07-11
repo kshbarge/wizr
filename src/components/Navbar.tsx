@@ -57,13 +57,43 @@ const Navbar: FC = () => {
     <nav>
       <ul>
         <li>
-          <NavLink to="/">Home</NavLink>
+          <NavLink
+            to="/"
+            className={user ? "disabled-link" : ""}
+            onClick={(event) => {
+              if (user) {
+                event.preventDefault();
+              }
+            }}
+          >
+            Home
+          </NavLink>
         </li>
         <li>
-          <NavLink to="/profile">Profile</NavLink>
+          <NavLink
+            to="/profile"
+            className={!user ? "disabled-link" : ""}
+            onClick={(event) => {
+              if (!user) {
+                event.preventDefault();
+              }
+            }}
+          >
+            Profile
+          </NavLink>
         </li>
         <li>
-          <NavLink to="/session">Session</NavLink>
+          <NavLink
+            to="/session"
+            className={!user ? "disabled-link" : ""}
+            onClick={(event) => {
+              if (!user) {
+                event.preventDefault();
+              }
+            }}
+          >
+            Session
+          </NavLink>
         </li>
         {user && <li>Welcome, {user.username}!</li>}
       </ul>

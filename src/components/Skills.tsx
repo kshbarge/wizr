@@ -5,8 +5,6 @@ import Swal from "sweetalert2";
 
 // const socket = io("http://localhost:4000");
 
-const matched = false; // Please, toggle this to true/false to test match or non-match scenarios
-
 interface SkillProps {
   skillToLearn: string;
   skillToTeach: string;
@@ -43,7 +41,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 3000,
+        timer: 5000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -60,7 +58,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 3000,
+        timer: 5000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -77,7 +75,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 3000,
+        timer: 5000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -90,7 +88,10 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       //   skillToLearn: selectedSkillToLearn,
       // });
 
-      if (matched) {
+      if (
+        selectedSkillToLearn === "Japanese" &&
+        selectedSkillToTeach === "German"
+      ) {
         await Swal.fire({
           icon: "success",
           iconColor: "#fdd673",

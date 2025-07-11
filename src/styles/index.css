@@ -72,6 +72,11 @@ nav ul li a.active {
   border-color: #fdd673;
 }
 
+.disabled-link {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 nav button {
   padding: 0.6rem 1.2rem;
   border: 1px solid black;
