@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 const APIuser = {
   email: "john@doe.com",
   password: "JohnDoe",
-  username: "This is John Doe",
+  username: "John2000",
   fullname: "John Doe",
   dateOfBirth: "2000-07-01",
 };
