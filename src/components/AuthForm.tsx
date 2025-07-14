@@ -145,7 +145,7 @@ const AuthForm: FC = () => {
       newUser.password = password;
       setUserContext({ username: newUser.username });
 
-      await Swal.fire({
+      Swal.fire({
         position: "top-end",
         icon: "success",
         iconColor: "#fdd673",
