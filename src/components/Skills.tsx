@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import io from "socket.io-client";
+import { runGermanQuiz } from "../utils/quiz";
+import io from "socket.io-client";
 import Swal from "sweetalert2";
 
-// const socket = io("http://localhost:4000");
-
-const matched = false; // Please, toggle this to true/false to test match or non-match scenarios
+const socket = io("http://localhost:4000");
 
 interface SkillProps {
   skillToLearn: string;
@@ -84,13 +83,16 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      // socket.emit("startMatch", {
-      //   userId: 1,
-      //   skillToTeach: selectedSkillToTeach,
-      //   skillToLearn: selectedSkillToLearn,
-      // });
+      socket.emit("startMatch", {
+        userId: 1,
+        skillToTeach: selectedSkillToTeach,
+        skillToLearn: selectedSkillToLearn,
+      });
 
-      if (matched) {
+      if (
+        selectedSkillToLearn === "Japanese" &&
+        selectedSkillToTeach === "German"
+      ) {
         await Swal.fire({
           icon: "success",
           iconColor: "#fdd673",
@@ -107,18 +109,27 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
 
         navigate("/session");
       } else {
-        await Swal.fire({
+        const result = await Swal.fire({
           icon: "error",
           iconColor: "#fdd673",
           title: "No match found!",
-          text: "Please, try again later.",
+          text: "Please, try again later or try our quiz!",
           customClass: {
             popup: "swal-popup swal-popup--error",
             title: "swal-title",
             confirmButton: "swal-button",
+            denyButton: "swal-button",
           },
-          confirmButtonText: "Okay",
+          showDenyButton: true,
+          confirmButtonText: "Play quiz",
+          denyButtonText: "Try again",
         });
+
+        if (result.isConfirmed) {
+          runGermanQuiz();
+        } else if (result.isDenied) {
+          handleMatch();
+        }
       }
     } catch (error) {
       console.error(error);
@@ -176,7 +187,9 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
               </label>
 
               <div className="button-group">
-                <button className= "button" type="submit">Save</button>
+                <button className="button" type="submit">
+                  Save
+                </button>
               </div>
             </form>
           ) : (
@@ -186,9 +199,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 <h3>Learn: {selectedSkillToLearn || "None selected"}</h3>
               </div>
               <div className="button-group">
-                <button className= "button" onClick={() => setEditing(true)}>Edit</button>
+                <button className="button" onClick={() => setEditing(true)}>
+                  Edit
+                </button>
                 <button
-                  className= "button"
+                  className="button"
                   onClick={handleMatch}
                   disabled={!selectedSkillToTeach || !selectedSkillToLearn}
                 >
