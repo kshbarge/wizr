@@ -1,24 +1,35 @@
 import React from "react";
+import { useState } from "react";
 
 interface UserCardProps {
-    username: string;
     avatar: string;
-    setUsername: (value: string) => void;
+    fullname: string;
+    username: string;
+    bio: string;
     setAvatar: (value: string) => void;
-  onSave?: (username: string, avatar: string) => void;
+    setFullname: (value: string) => void;
+    setUsername: (value: string) => void;
+    setBio: (value: string) => void;
+    onSave?: (avatar: string, fullname: string, username: string, bio: string) => void;
 }
 
 function UserCard({
-    username,
     avatar,
-    setUsername,
+    fullname,
+    username,
+    bio,
     setAvatar,
-  onSave,
+    setFullname,
+    setUsername,
+    setBio,
+    onSave,
 }: UserCardProps) {
+  const [editing, setEditing] = useState(false);
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (onSave) {
-            onSave(username, avatar);
+            onSave(avatar, fullname, username, bio );
         }
   };
 
@@ -33,42 +44,66 @@ function UserCard({
     return ( 
        <div className="card">
         <div className="imgBx">
-        {avatar ? (
-          <img src={avatar} alt="avatar" />
-        ) : (
-          <img
-            src="https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=mail@ashallendesign.co.uk"
-            alt="default avatar"
-          />
-            )}
-        </div>
-
-        <div className="content">
-         <div className="details">
-          <form onSubmit={handleSubmit}>
-            <label className="hide-file-input">
-              <h3>Choose Avatar</h3>
-            </label>
-                <input
+          <label htmlFor="avatar-upload">
+          <img 
+            src={avatar} 
+            alt="avatar" 
+            className="clickable-avatar"
+            title="change"
+            />
+            <input
+              id="avatar-upload"
               type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
+              accept="image/*"
+              onChange={handleImageChange}
               className="hide-file-input"
             />
-
-            <label>
-              <h3>Username</h3>
-                <input
-                type="text"
-                  value={username}
-                onChange={(event) => setUsername(event.target.value)}
-                />
             </label>
-             
-            <div className="actionBtn">
-            <button type="submit">Save</button>
+        </div>
+        <div className="content">
+        <div className="details">
+             {!editing ? (
+              <>
+             <h2>{fullname}</h2>
+             <h2>@{username}</h2>
+             <p>{bio}</p>
+             <div className= "button-group">
+             <button className= "button" onClick={() => setEditing(true)}>Edit Profile</button>
+             </div> 
+             </>
+             ) : (
+             <form onSubmit={handleSubmit}>
+             <label>
+              Full Name
+             <input
+             type="text"
+             value={fullname}
+             onChange={(event) => setFullname(event.target.value)}
+             />
+            </label>
+            <label>
+             Username
+            <input
+              type="text"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+            </label>
+            <label>
+             Bio
+            <textarea
+              value={bio}
+              onChange={(event) => setBio(event.target.value)}
+            />
+            </label>
+            <div className="button-group">
+            <button className= "button" type="submit">Save</button>
+            <button className= "button" type="button" onClick={() => setEditing(false)}>
+              Cancel 
+            </button>
             </div>
         </form>
+        )}
        </div>
      </div>
     </div>

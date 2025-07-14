@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { runGermanQuiz } from "../utils/quiz";
 // import io from "socket.io-client";
 import Swal from "sweetalert2";
 
 // const socket = io("http://localhost:4000");
+
+const matched = false; // Please, toggle this to true/false to test match or non-match scenarios
 
 interface SkillProps {
   skillToLearn: string;
@@ -42,7 +43,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 5000,
+        timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -59,7 +60,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 5000,
+        timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -76,7 +77,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
           title: "swal-title",
           timerProgressBar: "swal-bar",
         },
-        timer: 5000,
+        timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false,
@@ -89,10 +90,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       //   skillToLearn: selectedSkillToLearn,
       // });
 
-      if (
-        selectedSkillToLearn === "Japanese" &&
-        selectedSkillToTeach === "German"
-      ) {
+      if (matched) {
         await Swal.fire({
           icon: "success",
           iconColor: "#fdd673",
@@ -109,27 +107,18 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
 
         navigate("/session");
       } else {
-        const result = await Swal.fire({
+        await Swal.fire({
           icon: "error",
           iconColor: "#fdd673",
           title: "No match found!",
-          text: "Please, try again later or try our quiz!",
+          text: "Please, try again later.",
           customClass: {
             popup: "swal-popup swal-popup--error",
             title: "swal-title",
             confirmButton: "swal-button",
-            denyButton: "swal-button",
           },
-          showDenyButton: true,
-          confirmButtonText: "Play quiz",
-          denyButtonText: "Try again",
+          confirmButtonText: "Okay",
         });
-
-        if (result.isConfirmed) {
-          runGermanQuiz();
-        } else if (result.isDenied) {
-          handleMatch();
-        }
       }
     } catch (error) {
       console.error(error);
@@ -186,8 +175,8 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 </select>
               </label>
 
-              <div className="actionBtn">
-                <button type="submit">Save</button>
+              <div className="button-group">
+                <button className= "button" type="submit">Save</button>
               </div>
             </form>
           ) : (
@@ -196,9 +185,10 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 <h3>Teach: {selectedSkillToTeach || "None selected"}</h3>
                 <h3>Learn: {selectedSkillToLearn || "None selected"}</h3>
               </div>
-              <div className="actionBtn">
-                <button onClick={() => setEditing(true)}>Edit</button>
+              <div className="button-group">
+                <button className= "button" onClick={() => setEditing(true)}>Edit</button>
                 <button
+                  className= "button"
                   onClick={handleMatch}
                   disabled={!selectedSkillToTeach || !selectedSkillToLearn}
                 >
