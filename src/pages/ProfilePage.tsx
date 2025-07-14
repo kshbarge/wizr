@@ -1,26 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UserCard from "../components/UserCard";
 import Skills from "../components/Skills";
 import "../styles/ProfilePage.css";
+import { getUserByEmail, patchUserByEmail } from "../Api";
 
 function ProfilePage() {
-
-    const [username, setUsername] = useState("");
-    const [avatar, setAvatar] = useState("https://example.com/avatar.png");
+    const [avatar, setAvatar] = useState("https://picsum.photos/200");
+    const [fullname, setFullname] = useState("John Doe");
+    const [username, setUsername] = useState("Johnyfredo");
+    const [bio, setBio]=  useState("Describe a little about yourself...");
     const [skillToTeach, setSkillToTeach] = useState("Japanese");
     const [skillToLearn, setSkillToLearn] = useState("German");
 
-    const handleSave = ( newUsername: string, newAvatar: string) => {
-        console.log ("submitted",  newUsername, newAvatar);
-        setUsername(newUsername);
+    const handleSave = ( 
+      newAvatar: string,
+      newFullame: string,
+      newUsername: string,
+      newBio: string 
+      ) => {
         setAvatar(newAvatar);
+        setFullname(newFullame);
+        setUsername(newUsername);
+        setBio(newBio)   
     };
 
   const handleSkillSave = (
     newSkillToTeach: string,
     newSkillToLearn: string
   ) => {
-    console.log("submitted Skill", newSkillToTeach, newSkillToLearn);
     setSkillToTeach(newSkillToTeach);
     setSkillToLearn(newSkillToLearn);
   };
@@ -29,10 +36,14 @@ function ProfilePage() {
     <div className="profile-section">
       <h2>Your Profile</h2>
       <UserCard
-        username={username}
         avatar={avatar}
-        setUsername={setUsername}
+        fullname={fullname}
+        username={username}
+        bio={bio}
         setAvatar={setAvatar}
+        setFullname={setFullname}
+        setUsername={setUsername}
+        setBio={setBio}
         onSave={handleSave}
       />
       <Skills

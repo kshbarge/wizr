@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 function Video() {
     const [stream, setStream] = useState()
+    const[muted, setMuted] = useState(false)
 
     const mediaStreamConstraints = {
     audio: true,
