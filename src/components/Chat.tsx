@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
+import UserContext from '../contexts/userContext'
 import io from 'socket.io-client'
 
 const socket = io("http://localhost:9628");
@@ -7,7 +8,7 @@ function Chat() {
 
   const [input, setInput] = useState('')
   const [messageData, setMessageData] = useState([{body: "Welcome to the chat window!"}])
-
+ 
   function handleInputChange(e) {
     setInput(e.target.value)
   }
