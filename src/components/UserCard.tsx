@@ -2,24 +2,24 @@ import React from "react";
 import { useState } from "react";
 
 interface UserCardProps {
-    avatar: string;
-    fullname: string;
+    avatar_img_url: string;
+    name: string;
     username: string;
     bio: string;
     setAvatar: (value: string) => void;
-    setFullname: (value: string) => void;
+    setName: (value: string) => void;
     setUsername: (value: string) => void;
     setBio: (value: string) => void;
-    onSave?: (avatar: string, fullname: string, username: string, bio: string) => void;
+    onSave?: (avatar_img_url: string, name: string, username: string, bio: string) => void;
 }
 
 function UserCard({
-    avatar,
-    fullname,
+    avatar_img_url,
+    name,
     username,
     bio,
     setAvatar,
-    setFullname,
+    setName,
     setUsername,
     setBio,
     onSave,
@@ -29,7 +29,7 @@ function UserCard({
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (onSave) {
-            onSave(avatar, fullname, username, bio );
+            onSave(avatar_img_url, name, username, bio );
         }
   };
 
@@ -46,7 +46,7 @@ function UserCard({
         <div className="imgBx">
           <label htmlFor="avatar-upload">
           <img 
-            src={avatar} 
+            src={avatar_img_url} 
             alt="avatar" 
             className="clickable-avatar"
             title="change"
@@ -64,7 +64,7 @@ function UserCard({
         <div className="details">
              {!editing ? (
               <>
-             <h2>{fullname}</h2>
+             <h2>{name}</h2>
              <h2>@{username}</h2>
              <p>{bio}</p>
              <div className= "button-group">
@@ -77,8 +77,8 @@ function UserCard({
               Full Name
              <input
              type="text"
-             value={fullname}
-             onChange={(event) => setFullname(event.target.value)}
+             value={name}
+             onChange={(event) => setName(event.target.value)}
              />
             </label>
             <label>

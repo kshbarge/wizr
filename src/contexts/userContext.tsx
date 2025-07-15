@@ -6,7 +6,13 @@ import React, {
 } from "react";
 
 interface User {
+  email: string;
   username: string;
+  name?: string;
+  avatar_img_url?: string;
+  skills?: string;
+  learning?: string;
+  bio?: string;
 }
 
 type UserContextType = [
