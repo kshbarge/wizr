@@ -27,6 +27,7 @@ const newUser = {
 };
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
 const AuthForm: FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -37,6 +38,7 @@ const AuthForm: FC = () => {
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [displayForm, setDisplayForm] = useState<boolean>(false);
   const isValidEmail = emailRegex.test(email);
+  const isValidPassword = passwordRegex.test(password);
   const navigate = useNavigate();
   const context = useContext(UserContext);
 
@@ -105,10 +107,13 @@ const AuthForm: FC = () => {
       }
     } catch (error) {
       Swal.close();
+
       console.error("Error", error);
+
       Swal.fire({
         position: "top-end",
         icon: "error",
+        iconColor: "#fdd673",
         title: "Fetching error",
         text: "Unable to verify the email. Please, try again later.",
         customClass: {
@@ -260,6 +265,7 @@ const AuthForm: FC = () => {
           <input
             id="username"
             type="text"
+            value={username}
             onChange={(event) => setUsername(event.target.value)}
             required
           />
@@ -267,6 +273,7 @@ const AuthForm: FC = () => {
           <input
             id="fullname"
             type="text"
+            value={fullname}
             onChange={(event) => setFullname(event.target.value)}
             required
           />
@@ -274,6 +281,7 @@ const AuthForm: FC = () => {
           <input
             id="date-of-birth"
             type="date"
+            value={dateOfBirth}
             onChange={(event) => setDateOfBirth(event.target.value)}
             required
           />
@@ -281,10 +289,24 @@ const AuthForm: FC = () => {
           <input
             id="password"
             type="password"
+            value={password}
+            title="Password must contain at least six characters with a mix of letters and numbers"
+            placeholder="Hover on this for a password hint"
             onChange={(event) => setPassword(event.target.value)}
             required
           />
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            disabled={
+              !username ||
+              !fullname ||
+              !dateOfBirth ||
+              !password ||
+              !isValidPassword
+            }
+          >
+            Submit
+          </button>
         </div>
       )}
     </form>

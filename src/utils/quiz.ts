@@ -1,9 +1,15 @@
 import Swal from "sweetalert2";
 
+interface Question {
+  question: string;
+  options: Record<string, string>;
+  correct: string;
+}
+
 export const runGermanQuiz = async () => {
   let score = 0;
 
-  const questions = [
+  const questions: Question[] = [
     {
       question: 'What is the German word for "apple"?',
       options: {
@@ -46,6 +52,7 @@ export const runGermanQuiz = async () => {
 
       await Swal.fire({
         icon: "success",
+        iconColor: "#fdd673",
         title: "Correct!",
         text: `"${question.options[answer]}" is the right answer.`,
         customClass: {
@@ -57,6 +64,7 @@ export const runGermanQuiz = async () => {
     } else {
       await Swal.fire({
         icon: "error",
+        iconColor: "#fdd673",
         title: "Incorrect!",
         text: `The correct answer was "${question.options[question.correct]}".`,
         customClass: {
@@ -70,6 +78,7 @@ export const runGermanQuiz = async () => {
 
   await Swal.fire({
     icon: "info",
+    iconColor: "#fdd673",
     title: "Quiz completed!",
     text: `You scored ${score} out of ${questions.length}.`,
     customClass: {
