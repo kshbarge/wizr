@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { runGermanQuiz } from "../utils/quiz";
 import io from "socket.io-client";
@@ -21,6 +21,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const navigate = useNavigate();
 
   const skills = ["French", "English", "Japanese", "German"];
+
+   useEffect(() => {
+    setSelectedSkillToTeach(skillToTeach);
+    setSelectedSkillToLearn(skillToLearn);
+  }, [skillToTeach, skillToLearn]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
