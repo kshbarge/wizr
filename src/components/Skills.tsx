@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { runGermanQuiz } from "../utils/quiz";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import Swal from "sweetalert2";
 
-const socket = io("http://localhost:4000");
+// const socket = io("http://localhost:4000");
 
 interface SkillProps {
   skillToLearn: string;
@@ -21,6 +21,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const navigate = useNavigate();
 
   const skills = ["French", "English", "Japanese", "German"];
+
+   useEffect(() => {
+    setSelectedSkillToTeach(skillToTeach);
+    setSelectedSkillToLearn(skillToLearn);
+  }, [skillToTeach, skillToLearn]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -83,11 +88,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      socket.emit("startMatch", {
-        userId: 1,
-        skillToTeach: selectedSkillToTeach,
-        skillToLearn: selectedSkillToLearn,
-      });
+      // socket.emit("startMatch", {
+      //   userId: 1,
+      //   skillToTeach: selectedSkillToTeach,
+      //   skillToLearn: selectedSkillToLearn,
+      // });
 
       if (
         selectedSkillToLearn === "Japanese" &&
