@@ -1,150 +1,154 @@
 import { useState, useEffect, useRef } from "react";
-import Peer from 'simple-peer';
-import io from 'socket.io-client'
+import Peer from "simple-peer";
+import io from "socket.io-client";
 import Chat from "./Chat";
 
-const socket = io.connect("http://localhost:9811")
+const socket = io.connect("http://localhost:9811");
 
 function Video() {
-  const [stream, setStream] = useState();
-  const [muted, setMuted] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [stream, setStream] = useState<MediaStream>();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const [me, setMe] = useState("")
-  const [receivingCall, setReceivingCall] = useState(false)
-  const [caller, setCaller] = useState("")
-  const [callerSignal, setCallerSignal] = useState()
-  const [callAccepted, setCallAccepted] = useState(false)
-  const [idToCall, setIdToCall] = useState("")
-  const [callEnded, setCallEnded] = useState(false)
-  const [name, setName] = useState("")
-
-  const mediaStreamConstraints = {
-    audio: {
-      echoCancellation: true,
-      noiseSuppression: true,
-      autoGainControl: true,
-    },
-    video: true,
-  };
+  const [me, setMe] = useState("");
+  const [receivingCall, setReceivingCall] = useState(false);
+  const [caller, setCaller] = useState("");
+  const [callerSignal, setCallerSignal] = useState<any>();
+  const [callAccepted, setCallAccepted] = useState(false);
+  const [idToCall, setIdToCall] = useState("");
+  const [callEnded, setCallEnded] = useState(false);
+  const [name, setName] = useState("");
 
   const myVideo = useRef<HTMLVideoElement | null>(null);
-  const userVideo = useRef()
-  const connectionRef = useRef()
+  const userVideo = useRef<HTMLVideoElement | null>(null);
+  const connectionRef = useRef<any>();
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia(mediaStreamConstraints)
-      .then((stream) => {
-        setStream(stream);
-        myVideo.current.srcObject = stream;
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        if (myVideo.current) myVideo.current.srcObject = currentStream;
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch(console.error);
 
-      socket.on('me', (id) => {
-        setMe(id)
-      })
+    socket.on("me", (id: string) => {
+      setMe(id);
+    });
 
-      socket.on("callUser", (data) => {
-        setReceivingCall(true)
-        setCaller(data.from)
-        setName(data.name)
-        setCallerSignal(data.signal)
-      })
-
+    socket.on("callUser", (data: any) => {
+      setReceivingCall(true);
+      setCaller(data.from);
+      setName(data.name);
+      setCallerSignal(data.signal);
+    });
   }, []);
 
-  const callUser = (id) => {
+  const callUser = (id: string) => {
     const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        stream: stream
-    })
+      initiator: true,
+      trickle: false,
+      stream: stream,
+    });
 
     peer.on("signal", (data) => {
-        socket.emit("callUser", {
-            userToCall: id,
-            signalData: data,
-            from: me,
-            name: name
-        })
-    })
+      socket.emit("callUser", {
+        userToCall: id,
+        signalData: data,
+        from: me,
+        name,
+      });
+    });
 
-    peer.on("stream", (stream) => {
-        userVideo.current.srcObject = stream
-    })
+    peer.on("stream", (currentStream) => {
+      if (userVideo.current) userVideo.current.srcObject = currentStream;
+    });
 
-    socket.on("callAccepted", (signal) => {
-        setCallAccepted(true)
-        peer.signal(signal)
-    })
+    socket.on("callAccepted", (signal: any) => {
+      setCallAccepted(true);
+      peer.signal(signal);
+    });
 
-    connectionRef.current = peer
-  }
+    connectionRef.current = peer;
+  };
 
   const answerCall = () => {
-    setCallAccepted(true)
+    setCallAccepted(true);
     const peer = new Peer({
-        initiator: false,
-        trickle: false,
-        stream: stream
-    })
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
 
     peer.on("signal", (data) => {
-        socket.emit("answerCall", {signal: data, to: caller})
-    })
+      socket.emit("answerCall", { signal: data, to: caller });
+    });
 
-    peer.on("stream", (stream) => {
-        userVideo.current.srcObject = stream
-    })
+    peer.on("stream", (currentStream) => {
+      if (userVideo.current) userVideo.current.srcObject = currentStream;
+    });
 
-    peer.signal(callerSignal)
-    connectionRef.current = peer
-  }
+    peer.signal(callerSignal);
+    connectionRef.current = peer;
+  };
 
   const leaveCall = () => {
-    setCallEnded(true)
-    connectionRef.current.destroy()
-  }
-
-  function handleClick() {
-    if (isChatOpen) {
-        setIsChatOpen(false)
-    } else {
-        setIsChatOpen(true)
-    }
-  }
+    setCallEnded(true);
+    connectionRef.current.destroy();
+  };
 
   return (
     <>
       <h2>Video Chat</h2>
-      <div>
-        <section>
+      <div style={{ textAlign: "center", margin: "3rem auto" }}>
+        My ID: {me}
+      </div>
+      <div className="video-wrapper">
+        <section className="video-box">
           <h3>Local</h3>
           {stream && <video playsInline ref={myVideo} autoPlay muted />}
         </section>
-        <section>
+        <section className="video-box">
           <h3>Remote</h3>
-          {callAccepted && !callEnded ? <video playsInline ref={userVideo} autoPlay/> : null}
+          {callAccepted && !callEnded ? (
+            <video playsInline ref={userVideo} autoPlay />
+          ) : (
+            <h3>No remote video</h3>
+          )}
         </section>
       </div>
-      <div>
-        <input value={name} onChange={(e) => setName(e.target.value)}/>
-        <p>My ID: {me}</p>
-        <input value={idToCall} onChange={(e) => setIdToCall(e.target.value)}/>
-        {callAccepted && !callEnded ? <button onClick={leaveCall}>End Call</button> : <button aria-label="call" onClick={() => callUser(idToCall)}>Start call</button>}
-		{idToCall}
-        {receivingCall && !callAccepted ? (
-			<>
-				<h1 >{name} is calling...</h1>
-				<button onClick={answerCall}>Answer</button>
-			</>
-			) : null}
+
+      <div className="video-controls">
+        <input
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          placeholder="ID to call"
+          value={idToCall}
+          onChange={(e) => setIdToCall(e.target.value)}
+        />
+        {callAccepted && !callEnded ? (
+          <button onClick={leaveCall}>End Call</button>
+        ) : (
+          <button onClick={() => callUser(idToCall)}>Start Call</button>
+        )}
       </div>
-      <button onClick={handleClick}>{isChatOpen ? "Close chat" : "View chat"}</button>
-      {isChatOpen ? <Chat/> : ""}
+
+      {receivingCall && !callAccepted && (
+        <div className="video-controls">
+          <h3>{name} is calling...</h3>
+          <button onClick={answerCall}>Answer</button>
+        </div>
+      )}
+
+      <button
+        style={{ display: "block", margin: "3rem auto" }}
+        onClick={() => setIsChatOpen(!isChatOpen)}
+      >
+        {isChatOpen ? "Close chat" : "View chat"}
+      </button>
+      {isChatOpen && <Chat />}
     </>
   );
 }

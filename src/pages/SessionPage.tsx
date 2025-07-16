@@ -1,31 +1,8 @@
 import { useEffect, useContext } from "react";
+import Video from "../components/Video";
 import UserContext from "../contexts/userContext";
 import "../styles/SessionPage.css";
 import Swal from "sweetalert2";
-
-interface JitsiMeetExternalAPIConstructor {
-  new (
-    domain: string,
-    options: JitsiMeetExternalAPIOptions
-  ): JitsiMeetExternalAPIInstance;
-}
-
-interface JitsiMeetExternalAPIOptions {
-  roomName: string;
-  width: string | number;
-  height: string | number;
-  parentNode: HTMLElement | null;
-  configOverwrite?: Record<string, unknown>;
-  interfaceConfigOverwrite?: Record<string, unknown>;
-  userInfo?: {
-    displayName?: string;
-  };
-}
-
-interface JitsiMeetExternalAPIInstance {
-  addEventListener: (event: string, callback: () => void) => void;
-  dispose: () => void;
-}
 
 function SessionPage() {
   const context = useContext(UserContext);
@@ -37,96 +14,67 @@ function SessionPage() {
   const [user] = context;
 
   useEffect(() => {
-    const domain = "meet.jit.si";
-    const roomName =
-      "KnowledgeIsPower_" +
-      (user?.username || "Guest") +
-      "_" +
-      Math.floor(Math.random() * 100000);
+    console.log("Session started for", user?.username);
 
-    const options: JitsiMeetExternalAPIOptions = {
-      roomName,
-      width: "100%",
-      height: "100%",
-      parentNode: document.getElementById("jitsi-container"),
-      configOverwrite: {
-        startWithAudioMuted: true,
-        startWithVideoMuted: true,
-        prejoinPageEnabled: false,
-      },
-      interfaceConfigOverwrite: {
-        filmStripOnly: false,
-      },
-      userInfo: {
-        displayName: user?.username || "Guest",
-      },
-    };
-
-    const JitsiAPI = (
-      window as unknown as {
-        JitsiMeetExternalAPI: JitsiMeetExternalAPIConstructor;
-      }
-    ).JitsiMeetExternalAPI;
-
-    const api = new JitsiAPI(domain, options);
-
-    api.addEventListener("videoConferenceJoined", () => {
-      console.log("Joined room as", user?.username);
-    
     const lengthOfSessionInMins = 30;
-    const timeLeftWarningInMins = 5
+    const timeLeftWarningInMins = 5;
 
-    const timeUntilSessionWarning = (lengthOfSessionInMins - timeLeftWarningInMins) * 60 *1000;
-    const timeUntilSessionEnds = lengthOfSessionInMins * 60 * 1000
-    const fullLengthOfSessionInMins = 60
-    const endOfFullSession = fullLengthOfSessionInMins * 60 * 1000
+    const timeUntilSessionWarning =
+      (lengthOfSessionInMins - timeLeftWarningInMins) * 60 * 1000;
+    const timeUntilSessionEnds = lengthOfSessionInMins * 60 * 1000;
+    const fullLengthOfSessionInMins = 60;
+    const endOfFullSession = fullLengthOfSessionInMins * 60 * 1000;
 
-    setTimeout(() =>{
-       Swal.fire({
-              icon: "warning",
-              title: "5 minutes remaining",
-              text: "Your session will end in 5 minutes, get ready to swap over",
-              iconColor: "#fdd673",
-              confirmButtonText: "OK",
-              customClass: {
-                confirmButton: "swal-button",
-              },
-          })
-        }, timeUntilSessionWarning);
-          setTimeout(() =>{
-        Swal.fire({
-              icon: "info",
-              title: "Time to swap",
-              text: "Your turn has now ended, please swap over",
-              iconColor: "#fdd673",
-              confirmButtonText: "OK",
-              customClass: {
-                confirmButton: "swal-button",
-              },
-          })
-        }, timeUntilSessionEnds);
-         setTimeout(() =>{
-        Swal.fire({
-              icon: "info",
-              title: "Session has ended",
-              text: "The session has now ended",
-              iconColor: "#fdd673",
-              confirmButtonText: "OK",
-              customClass: {
-                confirmButton: "swal-button",
-              },
-          })
-        }, endOfFullSession);
-      })
-    return () => {api.dispose();
+    const warningTimer = setTimeout(() => {
+      Swal.fire({
+        icon: "warning",
+        title: "5 minutes remaining",
+        text: "Your session will end in 5 minutes, get ready to swap over",
+        iconColor: "#fdd673",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "swal-button",
+        },
+      });
+    }, timeUntilSessionWarning);
+
+    const endSessionTimer = setTimeout(() => {
+      Swal.fire({
+        icon: "info",
+        title: "Time to swap",
+        text: "Your turn has now ended, please swap over",
+        iconColor: "#fdd673",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "swal-button",
+        },
+      });
+    }, timeUntilSessionEnds);
+
+    const fullEndTimer = setTimeout(() => {
+      Swal.fire({
+        icon: "info",
+        title: "Session has ended",
+        text: "The session has now ended",
+        iconColor: "#fdd673",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "swal-button",
+        },
+      });
+    }, endOfFullSession);
+
+    return () => {
+      clearTimeout(warningTimer);
+      clearTimeout(endSessionTimer);
+      clearTimeout(fullEndTimer);
     };
   }, [user]);
-  
 
   return (
     <>
       <h2>Welcome to your Knowledge is Power session page:</h2>
-      <div id="jitsi-container" />
+      <Video />
     </>
   );
 }

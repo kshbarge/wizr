@@ -12,15 +12,17 @@ function Chat() {
 
   const context = useContext(UserContext);
   const [user] = context;
+        
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 
-  function handleInputChange(e) {
     setInput(e.target.value);
-  }
+  };
 
-  function handleSubmit(e) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+if (input.trim() !== "") {
     socket.emit("newMessage", { message: input, sender: user.username });
-  }
+  }}
 
   useEffect(() => {
     socket.on("message", (data) => {
@@ -29,28 +31,35 @@ function Chat() {
         { body: data.message, sentBy: data.sender },
       ]);
     });
-  }, [socket]);
+
+    return () => {
+      socket.off("message");
+    };
+  }, []);
 
   return (
-    <>
+    <div className="chat-box">
       <h2>User chat</h2>
-      <section>
+      <section className="chat-messages">
         {messageData.map((msg, index) => (
-          <div key={index} className={msg.sentBy === user.username ? "my-message" : ( msg.sentBy === "Room" ? "room-message" : "their-message")}>{msg.sentBy}: {msg.body}</div>
+
+          <div key={index} className={msg.sentBy === user.username ? "my-message chat-message" : ( msg.sentBy === "Room" ? "room-message" : "their-message")}>{msg.sentBy}: {msg.body}</div>
+
         ))}
       </section>
       <section>
-        <form onSubmit={handleSubmit}>
+        <form className="chat-form" onSubmit={handleSubmit}>
           <label htmlFor="messageInput">Message:</label>
           <textarea
             id="messageInput"
             placeholder="Type message here..."
+            value={input}
             onChange={handleInputChange}
           ></textarea>
           <button type="submit">Send</button>
         </form>
       </section>
-    </>
+    </div>
   );
 }
 
