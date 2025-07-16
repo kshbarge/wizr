@@ -11,17 +11,22 @@
   },
   "dependencies": {
     "@react-hooks-library/core": "^0.6.2",
+    "events": "^3.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3",
+    "simple-peer": "^9.11.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "sweetalert2": "^11.22.2"
+    "sweetalert2": "^11.22.2",
+    "util": "^0.12.5",
+    "vite-plugin-node-polyfills": "^0.24.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/simple-peer": "^9.11.8",
     "@types/socket.io-client": "^1.4.36",
     "@vitejs/plugin-react": "^4.5.2",
     "eslint": "^9.29.0",
@@ -31,5 +36,10 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0"
+  },
+  "overrides": {
+    "simple-peer": {
+      "randombytes": "browserify/randombytes#b4eb412"
+    }
   }
 }

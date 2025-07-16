@@ -1,35 +1,44 @@
 import { useState, useContext, type FC, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../contexts/userContext";
+import { getUsers } from "../../API.ts";
 import Swal from "sweetalert2";
 
-const APIuser = {
-  email: "john@doe.com",
-  password: "JohnDoe",
-  username: "John2000",
-  fullname: "John Doe",
-  dateOfBirth: "2000-07-01",
-};
+interface User {
+  username: string;
+  password: string;
+  name: string;
+  email: string;
+  DOB: string;
+  avatar_img_url?: string;
+  language?: string;
+  timezone?: string;
+  skills?: string[];
+  learning?: string[];
+  isOnline?: boolean;
+}
 
-const APInewUser = {
-  email: "",
-  password: "",
+const newUser = {
   username: "",
-  fullname: "",
-  dateOfBirth: "",
+  password: "",
+  name: "",
+  email: "",
+  DOB: "",
 };
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
 const AuthForm: FC = () => {
   const [email, setEmail] = useState<string>("");
-  const [isRegistered, setIsRegistered] = useState<boolean>(false);
-  const [displayForm, setDisplayForm] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [fullname, setFullname] = useState<string>("");
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [displayForm, setDisplayForm] = useState<boolean>(false);
   const isValidEmail = emailRegex.test(email);
+  const isValidPassword = passwordRegex.test(password);
   const navigate = useNavigate();
   const context = useContext(UserContext);
 
@@ -37,9 +46,9 @@ const AuthForm: FC = () => {
     throw new Error("No context");
   }
 
-  const [, setUser] = context;
+  const [, setUserContext] = context;
 
-  const handleEmail = (): void => {
+  const handleEmail = async (): Promise<void> => {
     Swal.fire({
       position: "top-end",
       title: "Verifying email...",
@@ -53,13 +62,20 @@ const AuthForm: FC = () => {
       },
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showConfirmButton: false,
     });
 
-    setTimeout(() => {
-      if (email === APIuser.email) {
+    try {
+      const allUsers: User[] = await getUsers();
+      const existingUser = allUsers.find((user) => user.email === email);
+
+      Swal.close();
+
+      if (existingUser) {
         setIsRegistered(true);
         setDisplayForm(false);
-        Swal.fire({
+
+        await Swal.fire({
           position: "top-end",
           icon: "success",
           iconColor: "#fdd673",
@@ -72,69 +88,16 @@ const AuthForm: FC = () => {
           },
         });
       } else {
-        APInewUser.email = email;
+        newUser.email = email;
         setIsRegistered(false);
         setDisplayForm(true);
-        Swal.fire({
+
+        await Swal.fire({
           position: "top-end",
           icon: "info",
           iconColor: "#fdd673",
           title: "Email not found",
           text: "Please, try again or fill the registration form.",
-          customClass: {
-            popup: "swal-popup",
-            title: "swal-title",
-            confirmButton: "swal-button",
-          },
-        });
-      }
-    }, 1500);
-  };
-
-  const handlePassword = (): void => {
-    Swal.fire({
-      position: "top-end",
-      title: "Verifying password...",
-      customClass: {
-        popup: "swal-popup",
-        title: "swal-title",
-        loader: "swal-loading",
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-    });
-
-    setTimeout(() => {
-      if (password === APIuser.password) {
-        setUser({ username: APIuser.username });
-
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          iconColor: "#fdd673",
-          title: "Access granted!",
-          text: "You have successfully logged in. Redirecting to your profile...",
-          customClass: {
-            popup: "swal-popup swal-popup--success",
-            title: "swal-title",
-          },
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        setTimeout(() => {
-          navigate("/profile");
-        }, 1500);
-      } else {
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          iconColor: "#fdd673",
-          title: "Incorrect password",
-          text: "Please, try again.",
           customClass: {
             popup: "swal-popup swal-popup--error",
             title: "swal-title",
@@ -142,10 +105,27 @@ const AuthForm: FC = () => {
           },
         });
       }
-    }, 1500);
+    } catch (error) {
+      Swal.close();
+
+      console.error("Error", error);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "Fetching error",
+        text: "Unable to verify the email. Please, try again later.",
+        customClass: {
+          popup: "swal-popup swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+      });
+    }
   };
 
-  const handleRegistration = (event: FormEvent): void => {
+  const handleRegistration = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
 
     Swal.fire({
@@ -164,11 +144,11 @@ const AuthForm: FC = () => {
     });
 
     setTimeout(() => {
-      APInewUser.username = username;
-      APInewUser.fullname = fullname;
-      APInewUser.dateOfBirth = dateOfBirth;
-      APInewUser.password = password;
-      setUser({ username: APInewUser.username });
+      newUser.username = username;
+      newUser.name = fullname;
+      newUser.DOB = dateOfBirth;
+      newUser.password = password;
+      setUserContext({ username: newUser.username });
 
       Swal.fire({
         position: "top-end",
@@ -189,6 +169,58 @@ const AuthForm: FC = () => {
         navigate("/profile");
       }, 1500);
     }, 1500);
+  };
+
+  const handlePassword = async (): Promise<void> => {
+    Swal.fire({
+      position: "top-end",
+      title: "Verifying password...",
+      customClass: {
+        popup: "swal-popup",
+        title: "swal-title",
+      },
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    const allUsers: User[] = await getUsers();
+    const existingUser = allUsers.find((user) => user.email === email);
+
+    if (existingUser?.password === password) {
+      setUserContext(existingUser);
+
+      await Swal.fire({
+        position: "top-end",
+        icon: "success",
+        iconColor: "#fdd673",
+        title: "Access granted!",
+        text: "You have successfully logged in. Redirecting to your profile...",
+        customClass: {
+          popup: "swal-popup swal-popup--success",
+          title: "swal-title",
+        },
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      navigate("/profile");
+    } else {
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "Incorrect password",
+        text: "Please, try again.",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+      });
+    }
   };
 
   return (
@@ -233,6 +265,7 @@ const AuthForm: FC = () => {
           <input
             id="username"
             type="text"
+            value={username}
             onChange={(event) => setUsername(event.target.value)}
             required
           />
@@ -240,6 +273,7 @@ const AuthForm: FC = () => {
           <input
             id="fullname"
             type="text"
+            value={fullname}
             onChange={(event) => setFullname(event.target.value)}
             required
           />
@@ -247,6 +281,7 @@ const AuthForm: FC = () => {
           <input
             id="date-of-birth"
             type="date"
+            value={dateOfBirth}
             onChange={(event) => setDateOfBirth(event.target.value)}
             required
           />
@@ -254,10 +289,24 @@ const AuthForm: FC = () => {
           <input
             id="password"
             type="password"
+            value={password}
+            title="Password must contain at least six characters with a mix of letters and numbers"
+            placeholder="Hover on this for a password hint"
             onChange={(event) => setPassword(event.target.value)}
             required
           />
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            disabled={
+              !username ||
+              !fullname ||
+              !dateOfBirth ||
+              !password ||
+              !isValidPassword
+            }
+          >
+            Submit
+          </button>
         </div>
       )}
     </form>

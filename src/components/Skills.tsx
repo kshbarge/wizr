@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import Swal from "sweetalert2";
-import { useContext } from "react";
 import UserContext from "../contexts/userContext";
+import { runGermanQuiz } from "../utils/quiz";
 
 const socket = io("http://localhost:9628");
-
-// const matched = true; // Please, toggle this to true/false to test match or non-match scenarios
 
 interface SkillProps {
   skillToLearn: string;
@@ -23,7 +21,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
     useState(skillToLearn);
   const navigate = useNavigate();
   const [user] = useContext(UserContext) || [];
-  console.log("User context object:", user);
 
   const skills = ["French", "English", "Japanese", "German"];
 
@@ -42,15 +39,29 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       });
     });
 
-    socket.on("matchNotFound", (data) => {
+    socket.on("matchNotFound", async (data) => {
       console.log("❌ NO MATCH:", data);
-      Swal.fire({
+      const result = await Swal.fire({
         icon: "error",
         iconColor: "#fdd673",
-        title: "No match found",
-        text: "Try again later!",
-        confirmButtonText: "Okay",
+        title: "No match found!",
+        text: "Please, try again later or try our quiz!",
+        showDenyButton: true,
+        confirmButtonText: "Play quiz",
+        denyButtonText: "Try again",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+          denyButton: "swal-button",
+        },
       });
+
+      if (result.isConfirmed) {
+        runGermanQuiz();
+      } else if (result.isDenied) {
+        handleMatch();
+      }
     });
 
     return () => {
@@ -78,11 +89,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         iconColor: "#fdd673",
         title: "Ready?",
         text: "You're about to learn some great stuff and teach what you really love!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -95,11 +101,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         iconColor: "#fdd673",
         title: "Timing",
         text: "Do not forget to swap when the notification appears!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -112,11 +113,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         iconColor: "#fdd673",
         title: "A thoughtful place",
         text: "Please, respect each other!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -124,7 +120,12 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      console.log("Sending startMatch socket with test data");
+      console.log("Sending startMatch socket with:", {
+        userId: user._id,
+        skillToTeach: selectedSkillToTeach,
+        skillToLearn: selectedSkillToLearn,
+      });
+
       socket.emit("startMatch", {
         userId: user._id,
         skillToTeach: selectedSkillToTeach,
@@ -132,21 +133,18 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       });
     } catch (error) {
       console.error(error);
-
-      await (async () => {
-        await Swal.fire({
-          icon: "error",
-          iconColor: "#fdd673",
-          title: "Sorry!",
-          text: "Something went wrong.",
-          customClass: {
-            popup: "swal-popup swal-popup--error",
-            title: "swal-title",
-            confirmButton: "swal-button",
-          },
-          confirmButtonText: "Back",
-        });
-      })();
+      await Swal.fire({
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "Sorry!",
+        text: "Something went wrong.",
+        confirmButtonText: "Back",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+      });
     }
   };
 
