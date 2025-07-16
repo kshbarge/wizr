@@ -6,48 +6,36 @@ import Chat from "./Chat";
 const socket = io.connect("http://localhost:9811");
 
 function Video() {
-  const [stream, setStream] = useState();
-  const [muted, setMuted] = useState(false);
+  const [stream, setStream] = useState<MediaStream>();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const [me, setMe] = useState("");
   const [receivingCall, setReceivingCall] = useState(false);
   const [caller, setCaller] = useState("");
-  const [callerSignal, setCallerSignal] = useState();
+  const [callerSignal, setCallerSignal] = useState<any>();
   const [callAccepted, setCallAccepted] = useState(false);
   const [idToCall, setIdToCall] = useState("");
   const [callEnded, setCallEnded] = useState(false);
   const [name, setName] = useState("");
 
-  const mediaStreamConstraints = {
-    audio: {
-      echoCancellation: true,
-      noiseSuppression: true,
-      autoGainControl: true,
-    },
-    video: true,
-  };
-
   const myVideo = useRef<HTMLVideoElement | null>(null);
-  const userVideo = useRef();
-  const connectionRef = useRef();
+  const userVideo = useRef<HTMLVideoElement | null>(null);
+  const connectionRef = useRef<any>();
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia(mediaStreamConstraints)
-      .then((stream) => {
-        setStream(stream);
-        myVideo.current.srcObject = stream;
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        setStream(currentStream);
+        if (myVideo.current) myVideo.current.srcObject = currentStream;
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch(console.error);
 
-    socket.on("me", (id) => {
+    socket.on("me", (id: string) => {
       setMe(id);
     });
 
-    socket.on("callUser", (data) => {
+    socket.on("callUser", (data: any) => {
       setReceivingCall(true);
       setCaller(data.from);
       setName(data.name);
@@ -55,7 +43,7 @@ function Video() {
     });
   }, []);
 
-  const callUser = (id) => {
+  const callUser = (id: string) => {
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -67,15 +55,15 @@ function Video() {
         userToCall: id,
         signalData: data,
         from: me,
-        name: name,
+        name,
       });
     });
 
-    peer.on("stream", (stream) => {
-      userVideo.current.srcObject = stream;
+    peer.on("stream", (currentStream) => {
+      if (userVideo.current) userVideo.current.srcObject = currentStream;
     });
 
-    socket.on("callAccepted", (signal) => {
+    socket.on("callAccepted", (signal: any) => {
       setCallAccepted(true);
       peer.signal(signal);
     });
@@ -95,8 +83,8 @@ function Video() {
       socket.emit("answerCall", { signal: data, to: caller });
     });
 
-    peer.on("stream", (stream) => {
-      userVideo.current.srcObject = stream;
+    peer.on("stream", (currentStream) => {
+      if (userVideo.current) userVideo.current.srcObject = currentStream;
     });
 
     peer.signal(callerSignal);
@@ -108,52 +96,59 @@ function Video() {
     connectionRef.current.destroy();
   };
 
-  function handleClick() {
-    if (isChatOpen) {
-      setIsChatOpen(false);
-    } else {
-      setIsChatOpen(true);
-    }
-  }
-
   return (
     <>
       <h2>Video Chat</h2>
-      <div>
-        <section>
+      <div style={{ textAlign: "center", margin: "3rem auto" }}>
+        My ID: {me}
+      </div>
+      <div className="video-wrapper">
+        <section className="video-box">
           <h3>Local</h3>
           {stream && <video playsInline ref={myVideo} autoPlay muted />}
         </section>
-        <section>
+        <section className="video-box">
           <h3>Remote</h3>
           {callAccepted && !callEnded ? (
             <video playsInline ref={userVideo} autoPlay />
-          ) : null}
+          ) : (
+            <h3>No remote video</h3>
+          )}
         </section>
       </div>
-      <div>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
-        <p>My ID: {me}</p>
-        <input value={idToCall} onChange={(e) => setIdToCall(e.target.value)} />
+
+      <div className="video-controls">
+        <input
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          placeholder="ID to call"
+          value={idToCall}
+          onChange={(e) => setIdToCall(e.target.value)}
+        />
         {callAccepted && !callEnded ? (
           <button onClick={leaveCall}>End Call</button>
         ) : (
-          <button aria-label="call" onClick={() => callUser(idToCall)}>
-            Start call
-          </button>
+          <button onClick={() => callUser(idToCall)}>Start Call</button>
         )}
-        {idToCall}
-        {receivingCall && !callAccepted ? (
-          <>
-            <h1>{name} is calling...</h1>
-            <button onClick={answerCall}>Answer</button>
-          </>
-        ) : null}
       </div>
-      <button onClick={handleClick}>
+
+      {receivingCall && !callAccepted && (
+        <div className="video-controls">
+          <h3>{name} is calling...</h3>
+          <button onClick={answerCall}>Answer</button>
+        </div>
+      )}
+
+      <button
+        style={{ display: "block", margin: "3rem auto" }}
+        onClick={() => setIsChatOpen(!isChatOpen)}
+      >
         {isChatOpen ? "Close chat" : "View chat"}
       </button>
-      {isChatOpen ? <Chat /> : ""}
+      {isChatOpen && <Chat />}
     </>
   );
 }

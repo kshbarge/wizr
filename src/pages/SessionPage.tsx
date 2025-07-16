@@ -1,6 +1,5 @@
 import { useEffect, useContext } from "react";
 import Video from "../components/Video";
-import Chat from "../components/Chat";
 import UserContext from "../contexts/userContext";
 import "../styles/SessionPage.css";
 import Swal from "sweetalert2";
@@ -75,9 +74,7 @@ function SessionPage() {
   return (
     <>
       <h2>Welcome to your Knowledge is Power session page:</h2>
-      <p>Prepare for your upcoming session!</p>
       <Video />
-      <Chat />
     </>
   );
 }
