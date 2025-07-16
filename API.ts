@@ -16,6 +16,22 @@ export async function getUsers() {
   }
 }
 
+export async function getSkills() {
+  try {
+    const response = await fetch(`https://wizr-z1na.onrender.com/users/skills`);
+
+    if (!response.ok) {
+      console.error(response.status);
+    }
+
+    const skills = await response.json();
+    return skills;
+  } catch (error) {
+    console.error("Failed to fetch skills:", error);
+    throw error;
+  }
+}
+
 export async function createUser(newUser: User): Promise<User> {
   try {
     const response = await fetch(
@@ -43,25 +59,24 @@ export async function createUser(newUser: User): Promise<User> {
 
 export async function updateUser(
   email: string,
-  updatedData: {
+  updateData: {
     username?: string;
     name?: string;
     avatar_img_url?: string;
     bio?: string;
-    skills?: string[];
-    learning?: string[];
+    teaching?: string;
+    learning?: string;
   }
 ) {
-  const response = await fetch(
-    `https://wizr-z1na.onrender.com/users/${email}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedData),
-    }
-  );
+  const response = await fetch(`https://wizr-z1na.onrender.com/users/update`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, updateData }),
+  });
+
+  console.log(email, updateData);
 
   if (!response.ok) {
     console.error("Failed to update user:", response.status);

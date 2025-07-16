@@ -7,7 +7,7 @@ export interface User {
   avatar_img_url?: string;
   language?: string;
   timezone?: string;
-  skills?: string[];
-  learning?: string[];
+  teaching?: string;
+  learning?: string;
   isOnline?: boolean;
 }

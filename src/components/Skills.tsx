@@ -4,6 +4,7 @@ import io from "socket.io-client";
 import Swal from "sweetalert2";
 import UserContext from "../contexts/userContext";
 import { runGermanQuiz } from "../utils/quiz";
+import { getSkills } from "../../API";
 
 const socket = io("http://localhost:3000");
 
@@ -15,14 +16,13 @@ interface SkillProps {
 
 function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const [editing, setEditing] = useState(false);
+  const [skills, setSkills] = useState([]);
   const [selectedSkillToTeach, setSelectedSkillToTeach] =
     useState(skillToTeach);
   const [selectedSkillToLearn, setSelectedSkillToLearn] =
     useState(skillToLearn);
   const navigate = useNavigate();
   const [user] = useContext(UserContext) || [];
-
-  const skills = ["French", "English", "Japanese", "German"];
 
   useEffect(() => {
     setSelectedSkillToTeach(skillToTeach);
@@ -74,6 +74,13 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       socket.off("matchNotFound");
     };
   }, []);
+
+  const handleEditSkills = async () => {
+    setEditing(true);
+
+    const fetchedSkills = await getSkills();
+    setSkills(fetchedSkills);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -167,11 +174,19 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   onChange={(e) => setSelectedSkillToTeach(e.target.value)}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((skill) => (
-                    <option key={skill} value={skill}>
-                      {skill}
-                    </option>
-                  ))}
+                  {skills.map((category) =>
+                    category.Sub_category.map(
+                      (subSkill) =>
+                        subSkill.skill && (
+                          <option
+                            key={`${subSkill.Sub_Cat_id}`}
+                            value={subSkill.skill}
+                          >
+                            {subSkill.skill}
+                          </option>
+                        )
+                    )
+                  )}
                 </select>
               </label>
 
@@ -182,11 +197,19 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   onChange={(e) => setSelectedSkillToLearn(e.target.value)}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((skill) => (
-                    <option key={skill} value={skill}>
-                      {skill}
-                    </option>
-                  ))}
+                  {skills.map((category) =>
+                    category.Sub_category.map(
+                      (subSkill) =>
+                        subSkill.skill && (
+                          <option
+                            key={`${subSkill.Sub_Cat_id}`}
+                            value={subSkill.skill}
+                          >
+                            {subSkill.skill}
+                          </option>
+                        )
+                    )
+                  )}
                 </select>
               </label>
 
@@ -203,7 +226,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 <h3>Learn: {selectedSkillToLearn || "None selected"}</h3>
               </div>
               <div className="button-group">
-                <button className="button" onClick={() => setEditing(true)}>
+                <button className="button" onClick={handleEditSkills}>
                   Edit
                 </button>
                 <button
