@@ -1,23 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-import Peer from 'simple-peer';
-import io from 'socket.io-client'
+import Peer from "simple-peer";
+import io from "socket.io-client";
 import Chat from "./Chat";
 
-const socket = io.connect("http://localhost:9811")
+const socket = io.connect("http://localhost:9811");
 
 function Video() {
   const [stream, setStream] = useState();
   const [muted, setMuted] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const [me, setMe] = useState("")
-  const [receivingCall, setReceivingCall] = useState(false)
-  const [caller, setCaller] = useState("")
-  const [callerSignal, setCallerSignal] = useState()
-  const [callAccepted, setCallAccepted] = useState(false)
-  const [idToCall, setIdToCall] = useState("")
-  const [callEnded, setCallEnded] = useState(false)
-  const [name, setName] = useState("")
+  const [me, setMe] = useState("");
+  const [receivingCall, setReceivingCall] = useState(false);
+  const [caller, setCaller] = useState("");
+  const [callerSignal, setCallerSignal] = useState();
+  const [callAccepted, setCallAccepted] = useState(false);
+  const [idToCall, setIdToCall] = useState("");
+  const [callEnded, setCallEnded] = useState(false);
+  const [name, setName] = useState("");
 
   const mediaStreamConstraints = {
     audio: {
@@ -29,8 +29,8 @@ function Video() {
   };
 
   const myVideo = useRef<HTMLVideoElement | null>(null);
-  const userVideo = useRef()
-  const connectionRef = useRef()
+  const userVideo = useRef();
+  const connectionRef = useRef();
 
   useEffect(() => {
     navigator.mediaDevices
@@ -41,79 +41,78 @@ function Video() {
       })
       .catch((error) => {
         console.log(error);
-      })
+      });
 
-      socket.on('me', (id) => {
-        setMe(id)
-      })
+    socket.on("me", (id) => {
+      setMe(id);
+    });
 
-      socket.on("callUser", (data) => {
-        setReceivingCall(true)
-        setCaller(data.from)
-        setName(data.name)
-        setCallerSignal(data.signal)
-      })
-
+    socket.on("callUser", (data) => {
+      setReceivingCall(true);
+      setCaller(data.from);
+      setName(data.name);
+      setCallerSignal(data.signal);
+    });
   }, []);
 
   const callUser = (id) => {
     const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        stream: stream
-    })
+      initiator: true,
+      trickle: false,
+      stream: stream,
+    });
 
     peer.on("signal", (data) => {
-        socket.emit("callUser", {
-            userToCall: id,
-            signalData: data,
-            from: me,
-            name: name
-        })
-    })
+      socket.emit("callUser", {
+        userToCall: id,
+        signalData: data,
+        from: me,
+        name: name,
+      });
+    });
 
     peer.on("stream", (stream) => {
-        userVideo.current.srcObject = stream
-    })
+      userVideo.current.srcObject = stream;
+    });
 
     socket.on("callAccepted", (signal) => {
-        setCallAccepted(true)
-        peer.signal(signal)
-    })
+      setCallAccepted(true);
+      peer.signal(signal);
+    });
 
-    connectionRef.current = peer
-  }
+    connectionRef.current = peer;
+  };
 
   const answerCall = () => {
-    setCallAccepted(true)
+    setCallAccepted(true);
     const peer = new Peer({
-        initiator: false,
-        trickle: false,
-        stream: stream
-    })
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
 
     peer.on("signal", (data) => {
-        socket.emit("answerCall", {signal: data, to: caller})
-    })
+      socket.emit("answerCall", { signal: data, to: caller });
+    });
 
     peer.on("stream", (stream) => {
-        userVideo.current.srcObject = stream
-    })
+      userVideo.current.srcObject = stream;
+    });
 
-    peer.signal(callerSignal)
-    connectionRef.current = peer
-  }
+    peer.signal(callerSignal);
+    connectionRef.current = peer;
+  };
 
   const leaveCall = () => {
-    setCallEnded(true)
-    connectionRef.current.destroy()
-  }
+    setCallEnded(true);
+    connectionRef.current.destroy();
+  };
 
   function handleClick() {
     if (isChatOpen) {
-        setIsChatOpen(false)
+      setIsChatOpen(false);
     } else {
-        setIsChatOpen(true)
+      setIsChatOpen(true);
     }
   }
 
@@ -127,24 +126,34 @@ function Video() {
         </section>
         <section>
           <h3>Remote</h3>
-          {callAccepted && !callEnded ? <video playsInline ref={userVideo} autoPlay/> : null}
+          {callAccepted && !callEnded ? (
+            <video playsInline ref={userVideo} autoPlay />
+          ) : null}
         </section>
       </div>
       <div>
-        <input value={name} onChange={(e) => setName(e.target.value)}/>
+        <input value={name} onChange={(e) => setName(e.target.value)} />
         <p>My ID: {me}</p>
-        <input value={idToCall} onChange={(e) => setIdToCall(e.target.value)}/>
-        {callAccepted && !callEnded ? <button onClick={leaveCall}>End Call</button> : <button aria-label="call" onClick={() => callUser(idToCall)}>Start call</button>}
-		{idToCall}
+        <input value={idToCall} onChange={(e) => setIdToCall(e.target.value)} />
+        {callAccepted && !callEnded ? (
+          <button onClick={leaveCall}>End Call</button>
+        ) : (
+          <button aria-label="call" onClick={() => callUser(idToCall)}>
+            Start call
+          </button>
+        )}
+        {idToCall}
         {receivingCall && !callAccepted ? (
-			<>
-				<h1 >{name} is calling...</h1>
-				<button onClick={answerCall}>Answer</button>
-			</>
-			) : null}
+          <>
+            <h1>{name} is calling...</h1>
+            <button onClick={answerCall}>Answer</button>
+          </>
+        ) : null}
       </div>
-      <button onClick={handleClick}>{isChatOpen ? "Close chat" : "View chat"}</button>
-      {isChatOpen ? <Chat/> : ""}
+      <button onClick={handleClick}>
+        {isChatOpen ? "Close chat" : "View chat"}
+      </button>
+      {isChatOpen ? <Chat /> : ""}
     </>
   );
 }
