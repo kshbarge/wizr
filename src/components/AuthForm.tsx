@@ -1,30 +1,9 @@
 import { useState, useContext, type FC, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../contexts/userContext";
-import { getUsers } from "../../API.ts";
+import { getUsers, createUser } from "../../API.ts";
+import type { User } from "../types/User";
 import Swal from "sweetalert2";
-
-interface User {
-  username: string;
-  password: string;
-  name: string;
-  email: string;
-  DOB: string;
-  avatar_img_url?: string;
-  language?: string;
-  timezone?: string;
-  skills?: string[];
-  learning?: string[];
-  isOnline?: boolean;
-}
-
-const newUser = {
-  username: "",
-  password: "",
-  name: "",
-  email: "",
-  DOB: "",
-};
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,}$/;
@@ -88,7 +67,6 @@ const AuthForm: FC = () => {
           },
         });
       } else {
-        newUser.email = email;
         setIsRegistered(false);
         setDisplayForm(true);
 
@@ -108,7 +86,7 @@ const AuthForm: FC = () => {
     } catch (error) {
       Swal.close();
 
-      console.error("Error", error);
+      console.error("Error:", error);
 
       Swal.fire({
         position: "top-end",
@@ -131,26 +109,28 @@ const AuthForm: FC = () => {
     Swal.fire({
       position: "top-end",
       title: "Registering...",
+      didOpen: () => Swal.showLoading(),
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       customClass: {
         popup: "swal-popup",
         title: "swal-title",
-        loader: "swal-loading",
       },
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false,
     });
 
-    setTimeout(() => {
-      newUser.username = username;
-      newUser.name = fullname;
-      newUser.DOB = dateOfBirth;
-      newUser.password = password;
-      setUserContext({ username: newUser.username });
+    try {
+      const userToCreate = {
+        ...newUser,
+        username,
+        name: fullname,
+        DOB: dateOfBirth,
+        password,
+      };
 
-      Swal.fire({
+      const createdUser = await createUser(userToCreate);
+      setUserContext(createdUser);
+
+      await Swal.fire({
         position: "top-end",
         icon: "success",
         iconColor: "#fdd673",
@@ -165,10 +145,23 @@ const AuthForm: FC = () => {
         showConfirmButton: false,
       });
 
-      setTimeout(() => {
-        navigate("/profile");
-      }, 1500);
-    }, 1500);
+      navigate("/profile");
+    } catch (error) {
+      console.error("Error:", error);
+
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "Registration failed",
+        text: "Please try again later.",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+        },
+      });
+    }
   };
 
   const handlePassword = async (): Promise<void> => {
