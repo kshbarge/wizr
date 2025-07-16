@@ -4,19 +4,7 @@ import React, {
   useEffect,
   type ReactNode,
 } from "react";
-
-interface User {
-  email: string;
-  username: string;
-  name?: string;
-  avatar_img_url?: string;
-  skills?: string;
-  learning?: string;
-  bio?: string;
-  skillsToTeach?: string[];
-  skillsToLearn?: string[];
-  [key: string]: any;
-}
+import type { User } from "../types/User";
 
 type UserContextType = [
   User | null,

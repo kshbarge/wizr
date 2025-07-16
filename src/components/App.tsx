@@ -14,7 +14,6 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/session" element={<SessionPage />} />
-        <Route path="/chat" element={<Chat/>}/>
         <Route path="/video" element={<Video/>}/>
       </Routes>
     </>
