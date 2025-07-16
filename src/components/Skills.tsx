@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 import Swal from "sweetalert2";
+import { useContext } from "react";
+import UserContext from "../contexts/userContext";
 
-// const socket = io("http://localhost:4000");
+const socket = io("http://localhost:9628");
 
-const matched = false; // Please, toggle this to true/false to test match or non-match scenarios
+// const matched = true; // Please, toggle this to true/false to test match or non-match scenarios
 
 interface SkillProps {
   skillToLearn: string;
@@ -20,8 +22,42 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const [selectedSkillToLearn, setSelectedSkillToLearn] =
     useState(skillToLearn);
   const navigate = useNavigate();
+  const [user] = useContext(UserContext) || [];
+  console.log("User context object:", user);
 
   const skills = ["French", "English", "Japanese", "German"];
+
+  useEffect(() => {
+    socket.on("matchFound", (data) => {
+      console.log("✅ MATCH FOUND:", data);
+      Swal.fire({
+        icon: "success",
+        iconColor: "#fdd673",
+        title: "Match found!",
+        text: "Redirecting to your session...",
+        timer: 3000,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate("/session");
+      });
+    });
+
+    socket.on("matchNotFound", (data) => {
+      console.log("❌ NO MATCH:", data);
+      Swal.fire({
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "No match found",
+        text: "Try again later!",
+        confirmButtonText: "Okay",
+      });
+    });
+
+    return () => {
+      socket.off("matchFound");
+      socket.off("matchNotFound");
+    };
+  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,6 +69,10 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
 
   const handleMatch = async () => {
     try {
+      if (user?.username) {
+        socket.emit("userOnline", { username: user.username });
+      }
+
       await Swal.fire({
         icon: "question",
         iconColor: "#fdd673",
@@ -84,57 +124,29 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      // socket.emit("startMatch", {
-      //   userId: 1,
-      //   skillToTeach: selectedSkillToTeach,
-      //   skillToLearn: selectedSkillToLearn,
-      // });
+      console.log("Sending startMatch socket with test data");
+      socket.emit("startMatch", {
+        userId: user._id,
+        skillToTeach: selectedSkillToTeach,
+        skillToLearn: selectedSkillToLearn,
+      });
+    } catch (error) {
+      console.error(error);
 
-      if (matched) {
-        await Swal.fire({
-          icon: "success",
-          iconColor: "#fdd673",
-          title: "Match found!",
-          text: "Redirecting to your session...",
-          customClass: {
-            popup: "swal-popup swal-popup--success",
-            title: "swal-title",
-            loader: "swal-loader",
-          },
-          timer: 3000,
-          showConfirmButton: false,
-        });
-
-        navigate("/session");
-      } else {
+      await (async () => {
         await Swal.fire({
           icon: "error",
           iconColor: "#fdd673",
-          title: "No match found!",
-          text: "Please, try again later.",
+          title: "Sorry!",
+          text: "Something went wrong.",
           customClass: {
             popup: "swal-popup swal-popup--error",
             title: "swal-title",
             confirmButton: "swal-button",
           },
-          confirmButtonText: "Okay",
+          confirmButtonText: "Back",
         });
-      }
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        iconColor: "#fdd673",
-        title: "Sorry!",
-        text: "Something went wrong.",
-        customClass: {
-          popup: "swal-popup swal-popup--error",
-          title: "swal-title",
-          confirmButton: "swal-button",
-        },
-        confirmButtonText: "Back",
-      });
+      })();
     }
   };
 
@@ -176,7 +188,9 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
               </label>
 
               <div className="button-group">
-                <button className= "button" type="submit">Save</button>
+                <button className="button" type="submit">
+                  Save
+                </button>
               </div>
             </form>
           ) : (
@@ -186,9 +200,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 <h3>Learn: {selectedSkillToLearn || "None selected"}</h3>
               </div>
               <div className="button-group">
-                <button className= "button" onClick={() => setEditing(true)}>Edit</button>
+                <button className="button" onClick={() => setEditing(true)}>
+                  Edit
+                </button>
                 <button
-                  className= "button"
+                  className="button"
                   onClick={handleMatch}
                   disabled={!selectedSkillToTeach || !selectedSkillToLearn}
                 >

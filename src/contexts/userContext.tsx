@@ -7,6 +7,9 @@ import React, {
 
 interface User {
   username: string;
+  skillsToTeach?: string[];
+  skillsToLearn?: string[];
+  [key: string]: any;
 }
 
 type UserContextType = [
@@ -29,6 +32,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("user");
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user?.username && !user._id) {
+      fetch("https://wizr-z1na.onrender.com/users")
+        .then((res) => res.json())
+        .then((data) => {
+          const fullUser = data.find((u) => u.username === user.username);
+          if (fullUser) setUser(fullUser);
+        })
+        .catch((err) => {
+          console.error("User fetch failed:", err);
+        });
+    }
+  }, [user?.username]);
 
   return (
     <UserContext.Provider value={[user, setUser]}>
