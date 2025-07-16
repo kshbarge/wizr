@@ -36,7 +36,7 @@ function Chat() {
       <h2>User chat</h2>
       <section>
         {messageData.map((msg, index) => (
-          <div key={index}>{msg.sentBy}: {msg.body}</div>
+          <div key={index} className={msg.sentBy === user.username ? "my-message" : ( msg.sentBy === "Room" ? "room-message" : "their-message")}>{msg.sentBy}: {msg.body}</div>
         ))}
       </section>
       <section>
