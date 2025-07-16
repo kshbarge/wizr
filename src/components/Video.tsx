@@ -96,6 +96,24 @@ function Video() {
     connectionRef.current.destroy();
   };
 
+  const handleCamera = () => {
+    console.log("Camera!")
+    if(stream.getVideoTracks()[0].enabled) {
+      stream.getVideoTracks()[0].enabled = false;
+    } else {
+      stream.getVideoTracks()[0].enabled = true;
+    }
+  };
+
+  const handleMicrophone = () => {
+    console.log("Mic!")
+    if(stream.getAudioTracks()[0].enabled) {
+      stream.getAudioTracks()[0].enabled = false;
+    } else {
+      stream.getAudioTracks()[0].enabled = true;
+    }
+  }
+
   return (
     <>
       <h2>Video Chat</h2>
@@ -118,6 +136,8 @@ function Video() {
       </div>
 
       <div className="video-controls">
+        <button onClick={handleCamera}>Toggle Camera</button>
+        <button onClick={handleMicrophone}>Toggle Microphone</button>
         <input
           placeholder="Your name"
           value={name}
