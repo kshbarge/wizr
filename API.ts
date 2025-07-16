@@ -1,3 +1,5 @@
+import type { User } from "./src/types/User";
+
 export async function getUsers() {
   try {
     const response = await fetch(`https://wizr-z1na.onrender.com/users`);
@@ -10,6 +12,7 @@ export async function getUsers() {
     return users;
   } catch (error) {
     console.error("Failed to fetch users:", error);
+    throw error;
   }
 }
 
@@ -34,6 +37,7 @@ export async function createUser(newUser: User): Promise<User> {
     return createdUser;
   } catch (error) {
     console.error("Failed to create user:", error);
+    throw error;
   }
 }
 

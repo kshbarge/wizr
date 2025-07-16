@@ -120,7 +120,7 @@ const AuthForm: FC = () => {
 
     try {
       const userToCreate = {
-        ...newUser,
+        email,
         username,
         name: fullname,
         DOB: dateOfBirth,
