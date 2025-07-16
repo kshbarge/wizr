@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { runGermanQuiz } from "../utils/quiz";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 import Swal from "sweetalert2";
+import UserContext from "../contexts/userContext";
+import { runGermanQuiz } from "../utils/quiz";
 
-// const socket = io("http://localhost:4000");
+const socket = io("http://localhost:9628");
 
 interface SkillProps {
   skillToLearn: string;
@@ -19,13 +20,55 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const [selectedSkillToLearn, setSelectedSkillToLearn] =
     useState(skillToLearn);
   const navigate = useNavigate();
+  const [user] = useContext(UserContext) || [];
 
   const skills = ["French", "English", "Japanese", "German"];
 
-   useEffect(() => {
-    setSelectedSkillToTeach(skillToTeach);
-    setSelectedSkillToLearn(skillToLearn);
-  }, [skillToTeach, skillToLearn]);
+  useEffect(() => {
+    socket.on("matchFound", (data) => {
+      console.log("✅ MATCH FOUND:", data);
+      Swal.fire({
+        icon: "success",
+        iconColor: "#fdd673",
+        title: "Match found!",
+        text: "Redirecting to your session...",
+        timer: 3000,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate("/session");
+      });
+    });
+
+    socket.on("matchNotFound", async (data) => {
+      console.log("❌ NO MATCH:", data);
+      const result = await Swal.fire({
+        icon: "error",
+        iconColor: "#fdd673",
+        title: "No match found!",
+        text: "Please, try again later or try our quiz!",
+        showDenyButton: true,
+        confirmButtonText: "Play quiz",
+        denyButtonText: "Try again",
+        customClass: {
+          popup: "swal-popup swal-popup--error",
+          title: "swal-title",
+          confirmButton: "swal-button",
+          denyButton: "swal-button",
+        },
+      });
+
+      if (result.isConfirmed) {
+        runGermanQuiz();
+      } else if (result.isDenied) {
+        handleMatch();
+      }
+    });
+
+    return () => {
+      socket.off("matchFound");
+      socket.off("matchNotFound");
+    };
+  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,16 +80,15 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
 
   const handleMatch = async () => {
     try {
+      if (user?.username) {
+        socket.emit("userOnline", { username: user.username });
+      }
+
       await Swal.fire({
         icon: "question",
         iconColor: "#fdd673",
         title: "Ready?",
         text: "You're about to learn some great stuff and teach what you really love!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -59,11 +101,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         iconColor: "#fdd673",
         title: "Timing",
         text: "Do not forget to swap when the notification appears!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -76,11 +113,6 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         iconColor: "#fdd673",
         title: "A thoughtful place",
         text: "Please, respect each other!",
-        customClass: {
-          popup: "swal-popup",
-          title: "swal-title",
-          timerProgressBar: "swal-bar",
-        },
         timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -88,68 +120,30 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
         allowEscapeKey: false,
       });
 
-      // socket.emit("startMatch", {
-      //   userId: 1,
-      //   skillToTeach: selectedSkillToTeach,
-      //   skillToLearn: selectedSkillToLearn,
-      // });
+      console.log("Sending startMatch socket with:", {
+        userId: user._id,
+        skillToTeach: selectedSkillToTeach,
+        skillToLearn: selectedSkillToLearn,
+      });
 
-      if (
-        selectedSkillToLearn === "Japanese" &&
-        selectedSkillToTeach === "German"
-      ) {
-        await Swal.fire({
-          icon: "success",
-          iconColor: "#fdd673",
-          title: "Match found!",
-          text: "Redirecting to your session...",
-          customClass: {
-            popup: "swal-popup swal-popup--success",
-            title: "swal-title",
-            loader: "swal-loader",
-          },
-          timer: 3000,
-          showConfirmButton: false,
-        });
-
-        navigate("/session");
-      } else {
-        const result = await Swal.fire({
-          icon: "error",
-          iconColor: "#fdd673",
-          title: "No match found!",
-          text: "Please, try again later or try our quiz!",
-          customClass: {
-            popup: "swal-popup swal-popup--error",
-            title: "swal-title",
-            confirmButton: "swal-button",
-            denyButton: "swal-button",
-          },
-          showDenyButton: true,
-          confirmButtonText: "Play quiz",
-          denyButtonText: "Try again",
-        });
-
-        if (result.isConfirmed) {
-          runGermanQuiz();
-        } else if (result.isDenied) {
-          handleMatch();
-        }
-      }
+      socket.emit("startMatch", {
+        userId: user._id,
+        skillToTeach: selectedSkillToTeach,
+        skillToLearn: selectedSkillToLearn,
+      });
     } catch (error) {
       console.error(error);
-
       await Swal.fire({
         icon: "error",
         iconColor: "#fdd673",
         title: "Sorry!",
         text: "Something went wrong.",
+        confirmButtonText: "Back",
         customClass: {
           popup: "swal-popup swal-popup--error",
           title: "swal-title",
           confirmButton: "swal-button",
         },
-        confirmButtonText: "Back",
       });
     }
   };

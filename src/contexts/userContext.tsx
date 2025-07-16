@@ -27,6 +27,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user?.username && !user._id) {
+      fetch("https://wizr-z1na.onrender.com/users")
+        .then((res) => res.json())
+        .then((data) => {
+          const fullUser = data.find((u) => u.username === user.username);
+          if (fullUser) setUser(fullUser);
+        })
+        .catch((err) => {
+          console.error("User fetch failed:", err);
+        });
+    }
+  }, [user?.username]);
+
   return (
     <UserContext.Provider value={[user, setUser]}>
       {children}
