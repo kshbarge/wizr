@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import UserContext from "../contexts/userContext";
 import { runGermanQuiz } from "../utils/quiz";
 
-const socket = io("http://localhost:9628");
+const socket = io("http://localhost:3000");
 
 interface SkillProps {
   skillToLearn: string;
@@ -23,6 +23,11 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   const [user] = useContext(UserContext) || [];
 
   const skills = ["French", "English", "Japanese", "German"];
+
+  useEffect(() => {
+    setSelectedSkillToTeach(skillToTeach);
+    setSelectedSkillToLearn(skillToLearn);
+  }, [skillToTeach, skillToLearn]);
 
   useEffect(() => {
     socket.on("matchFound", (data) => {
