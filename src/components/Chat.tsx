@@ -2,7 +2,9 @@ import { useEffect, useState, useContext } from "react";
 import UserContext from "../contexts/userContext";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:9628");
+const socket = io("https://heroic-hotteok-38d31a.netlify.app/", {
+  path: "/session/"
+});
 
 function Chat() {
   const [input, setInput] = useState("");
@@ -53,12 +55,13 @@ function Chat() {
               msg.sentBy === user?.username
                 ? "my-message chat-message"
                 : msg.sentBy === "Room"
-                ? "room-message"
-                : "their-message"
+                ? "my-message room-message"
+                : "my-message their-message"
             }
           >
             {msg.sentBy}: {msg.body}
           </div>
+
         ))}
       </section>
       <section>
