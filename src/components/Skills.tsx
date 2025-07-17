@@ -6,7 +6,7 @@ import UserContext from "../contexts/userContext";
 import { runGermanQuiz } from "../utils/quiz";
 import { getSkills } from "../../API";
 
-const socket = io("http://localhost:3000");
+const socket = io(import.meta.env.VITE_BACKEND_URL);
 
 interface SkillProps {
   skillToLearn: string;
