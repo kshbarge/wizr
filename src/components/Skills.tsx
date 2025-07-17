@@ -27,6 +27,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   useEffect(() => {
     setSelectedSkillToTeach(skillToTeach);
     setSelectedSkillToLearn(skillToLearn);
+    console.log(skillToTeach, skillToLearn);
   }, [skillToTeach, skillToLearn]);
 
   useEffect(() => {
@@ -171,7 +172,10 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                 Skill to Teach:
                 <select
                   value={selectedSkillToTeach}
-                  onChange={(e) => setSelectedSkillToTeach(e.target.value)}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setSelectedSkillToTeach(e.target.value);
+                  }}
                 >
                   <option value="">Select a skill</option>
                   {skills.map((category) => (

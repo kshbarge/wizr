@@ -26,8 +26,8 @@ function ProfilePage() {
       setName(user.name || "");
       setUsername(user.username || "");
       setBio(user.bio || "Tell us a little about yourself...");
-      setSkillToTeach(user.teaching?.[0] || "");
-      setSkillToLearn(user.learning?.[0] || "");
+      setSkillToTeach(user.teaching || "");
+      setSkillToLearn(user.learning || "");
     }
   }, [user]);
 
@@ -60,15 +60,21 @@ function ProfilePage() {
       return;
     }
 
-    setSkillToTeach(teach);
-    setSkillToLearn(learn);
+    // setSkillToTeach(teach);
+    // setSkillToLearn(learn);
 
     if (user) {
       updateUser(user.email, {
         teaching: teach,
         learning: learn,
       })
-        .then((updatedUser) => setUser(updatedUser))
+        .then(() => {
+          setUser({
+            ...user,
+            teaching: teach,
+            learning: learn,
+          });
+        })
         .catch((err) => console.error("Failed to update skills", err));
     }
   };
