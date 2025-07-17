@@ -31,7 +31,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
   }, [skillToTeach, skillToLearn]);
 
   useEffect(() => {
-    socket.on("matchFound", (data) => {
+    socket.on("matchFound", (data: any) => {
       console.log("✅ MATCH FOUND:", data);
       Swal.fire({
         icon: "success",
@@ -45,7 +45,7 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       });
     });
 
-    socket.on("matchNotFound", async (data) => {
+    socket.on("matchNotFound", async (data: any) => {
       console.log("❌ NO MATCH:", data);
       const result = await Swal.fire({
         icon: "error",
@@ -134,13 +134,13 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
       });
 
       console.log("Sending startMatch socket with:", {
-        userId: user._id,
+        userId: user?._id,
         skillToTeach: selectedSkillToTeach,
         skillToLearn: selectedSkillToLearn,
       });
 
       socket.emit("startMatch", {
-        userId: user._id,
+        userId: user?._id,
         skillToTeach: selectedSkillToTeach,
         skillToLearn: selectedSkillToLearn,
       });
@@ -178,13 +178,13 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   }}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((category) => (
+                  {skills.map((category: any) => (
                     <optgroup
                       key={category.category_id}
                       label={category.category}
                     >
                       {category.Sub_category.map(
-                        (subSkill) =>
+                        (subSkill: any) =>
                           subSkill.skill && (
                             <option
                               key={subSkill.Sub_Cat_id}
@@ -206,13 +206,13 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   onChange={(e) => setSelectedSkillToLearn(e.target.value)}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((category) => (
+                  {skills.map((category: any) => (
                     <optgroup
                       key={category.category_id}
                       label={category.category}
                     >
                       {category.Sub_category.map(
-                        (subSkill) =>
+                        (subSkill: any) =>
                           subSkill.skill && (
                             <option
                               key={subSkill.Sub_Cat_id}

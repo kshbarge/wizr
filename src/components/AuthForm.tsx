@@ -9,6 +9,7 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
 const AuthForm: FC = () => {
+  const [_id] = useState<object>({});
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -120,6 +121,7 @@ const AuthForm: FC = () => {
 
     try {
       const userToCreate = {
+        _id,
         email,
         username,
         name: fullname,

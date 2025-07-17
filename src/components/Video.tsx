@@ -8,7 +8,7 @@ const socket = io.connect("https://heroic-hotteok-38d31a.netlify.app/", {
 });
 
 function Video() {
-  const [stream, setStream] = useState<MediaStream>();
+  const [stream, setStream] = useState<MediaStream | any>();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const [me, setMe] = useState("");
@@ -22,7 +22,7 @@ function Video() {
 
   const myVideo = useRef<HTMLVideoElement | null>(null);
   const userVideo = useRef<HTMLVideoElement | null>(null);
-  const connectionRef = useRef<any>();
+  const connectionRef = useRef<any>(null);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -114,7 +114,7 @@ function Video() {
     } else {
       stream.getAudioTracks()[0].enabled = true;
     }
-  }
+  };
 
   return (
     <>
