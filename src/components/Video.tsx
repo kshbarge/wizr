@@ -3,7 +3,9 @@ import Peer from "simple-peer";
 import io from "socket.io-client";
 import Chat from "./Chat";
 
-const socket = io.connect("http://localhost:9811");
+const socket = io.connect("https://heroic-hotteok-38d31a.netlify.app/", {
+  path: "/session/"
+});
 
 function Video() {
   const [stream, setStream] = useState<MediaStream>();
@@ -98,7 +100,7 @@ function Video() {
 
   const handleCamera = () => {
     console.log("Camera!")
-    if(stream.getVideoTracks()[0].enabled) {
+    if(stream?.getVideoTracks()[0].enabled) {
       stream.getVideoTracks()[0].enabled = false;
     } else {
       stream.getVideoTracks()[0].enabled = true;
@@ -107,7 +109,7 @@ function Video() {
 
   const handleMicrophone = () => {
     console.log("Mic!")
-    if(stream.getAudioTracks()[0].enabled) {
+    if(stream?.getAudioTracks()[0].enabled) {
       stream.getAudioTracks()[0].enabled = false;
     } else {
       stream.getAudioTracks()[0].enabled = true;
