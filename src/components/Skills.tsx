@@ -11,7 +11,7 @@ const socket = io("http://localhost:3000");
 interface SkillProps {
   skillToLearn: string;
   skillToTeach: string;
-  onSave?: (teach: string, learn: string) => void;
+  onSave?: (teaching: string, learning: string) => void;
 }
 
 function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
@@ -174,19 +174,24 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   onChange={(e) => setSelectedSkillToTeach(e.target.value)}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((category) =>
-                    category.Sub_category.map(
-                      (subSkill) =>
-                        subSkill.skill && (
-                          <option
-                            key={`${subSkill.Sub_Cat_id}`}
-                            value={subSkill.skill}
-                          >
-                            {subSkill.skill}
-                          </option>
-                        )
-                    )
-                  )}
+                  {skills.map((category) => (
+                    <optgroup
+                      key={category.category_id}
+                      label={category.category}
+                    >
+                      {category.Sub_category.map(
+                        (subSkill) =>
+                          subSkill.skill && (
+                            <option
+                              key={subSkill.Sub_Cat_id}
+                              value={subSkill.skill}
+                            >
+                              {subSkill.skill}
+                            </option>
+                          )
+                      )}
+                    </optgroup>
+                  ))}
                 </select>
               </label>
 
@@ -197,19 +202,24 @@ function Skills({ skillToTeach, skillToLearn, onSave }: SkillProps) {
                   onChange={(e) => setSelectedSkillToLearn(e.target.value)}
                 >
                   <option value="">Select a skill</option>
-                  {skills.map((category) =>
-                    category.Sub_category.map(
-                      (subSkill) =>
-                        subSkill.skill && (
-                          <option
-                            key={`${subSkill.Sub_Cat_id}`}
-                            value={subSkill.skill}
-                          >
-                            {subSkill.skill}
-                          </option>
-                        )
-                    )
-                  )}
+                  {skills.map((category) => (
+                    <optgroup
+                      key={category.category_id}
+                      label={category.category}
+                    >
+                      {category.Sub_category.map(
+                        (subSkill) =>
+                          subSkill.skill && (
+                            <option
+                              key={subSkill.Sub_Cat_id}
+                              value={subSkill.skill}
+                            >
+                              {subSkill.skill}
+                            </option>
+                          )
+                      )}
+                    </optgroup>
+                  ))}
                 </select>
               </label>
 

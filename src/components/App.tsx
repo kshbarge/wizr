@@ -3,8 +3,6 @@ import LoginPage from "../pages/LoginPage";
 import ProfilePage from "../pages/ProfilePage";
 import SessionPage from "../pages/SessionPage";
 import Header from "./Header";
-import Chat from './Chat'
-import Video from "./Video"
 
 function App() {
   return (
@@ -14,7 +12,6 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/session" element={<SessionPage />} />
-        <Route path="/video" element={<Video/>}/>
       </Routes>
     </>
   );
