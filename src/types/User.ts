@@ -1,4 +1,5 @@
 export interface User {
+  _id: object;
   username: string;
   password: string;
   name: string;
@@ -10,4 +11,5 @@ export interface User {
   teaching?: string;
   learning?: string;
   isOnline?: boolean;
+  bio?: string;
 }

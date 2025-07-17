@@ -32,7 +32,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       fetch("https://wizr-z1na.onrender.com/users")
         .then((res) => res.json())
         .then((data) => {
-          const fullUser = data.find((u) => u.username === user.username);
+          const fullUser = data.find((u: any) => u.username === user.username);
           if (fullUser) setUser(fullUser);
         })
         .catch((err) => {

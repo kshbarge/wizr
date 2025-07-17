@@ -6,7 +6,7 @@ import Chat from "./Chat";
 const socket = io.connect("http://localhost:9811");
 
 function Video() {
-  const [stream, setStream] = useState<MediaStream>();
+  const [stream, setStream] = useState<MediaStream | any>();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const [me, setMe] = useState("");
@@ -20,7 +20,7 @@ function Video() {
 
   const myVideo = useRef<HTMLVideoElement | null>(null);
   const userVideo = useRef<HTMLVideoElement | null>(null);
-  const connectionRef = useRef<any>();
+  const connectionRef = useRef<any>(null);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -97,8 +97,8 @@ function Video() {
   };
 
   const handleCamera = () => {
-    console.log("Camera!")
-    if(stream.getVideoTracks()[0].enabled) {
+    console.log("Camera!");
+    if (stream.getVideoTracks()[0].enabled) {
       stream.getVideoTracks()[0].enabled = false;
     } else {
       stream.getVideoTracks()[0].enabled = true;
@@ -106,13 +106,13 @@ function Video() {
   };
 
   const handleMicrophone = () => {
-    console.log("Mic!")
-    if(stream.getAudioTracks()[0].enabled) {
+    console.log("Mic!");
+    if (stream.getAudioTracks()[0].enabled) {
       stream.getAudioTracks()[0].enabled = false;
     } else {
       stream.getAudioTracks()[0].enabled = true;
     }
-  }
+  };
 
   return (
     <>
