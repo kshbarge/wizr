@@ -1,69 +1,13 @@
-# React + TypeScript + Vite
+# WIZR
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+>The deployed version of this project can be found at https://heroic-hotteok-38d31a.netlify.app/.
 
-Currently, two official plugins are available:
+>The backend repository for this project can be found at https://github.com/kshbarge/wizr-backend.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+WIZR is a video app that is designed to help you share knowledge with other users. By logging in to your account and selecting something you want to learn and something you want to teach, you can get paired with another user who's needs match yours and be placed into a video chat with them.
 
-## Expanding the ESLint configuration
+## Project overview
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The WIZR frontend has been scaffolded using React and Vite. All of our components and contexts can be found in the src file.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+When running the project locally, please run `npm install` first to make sure that all of the app's dependencies are accessible. To run the frontend, use `npm run dev`. The minimum node version requirement for this project is v23.11.0.
